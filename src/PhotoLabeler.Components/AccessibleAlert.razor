@@ -1,0 +1,76 @@
+﻿@using System.Timers
+
+@if (this.Type == AlertType.Alert)
+{
+	<div role="alert">
+		<p>@GetText()</p>
+	</div>
+}
+else
+{
+	<div aria-live="@(this.Type == AlertType.Alert ? "assertive" : "polite")">
+		<p>@GetText()</p>
+	</div>
+}
+
+@code
+{
+
+	public enum AlertType
+	{
+		Alert,
+		Assertive,
+		Polite
+	}
+
+	[Parameter]
+	public string Text { get; set; }
+
+	[Parameter]
+	public AlertType Type { get; set; } = AlertType.Assertive;
+
+	private bool textRemoved = false;
+
+	private Timer timer;
+	private bool beforeFirstRender = true;
+
+	private string GetText()
+	{
+		if (textRemoved || beforeFirstRender)
+		{
+			return string.Empty;
+		}
+		return Text;
+	}
+
+	protected override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+		timer = new Timer();
+		timer.Interval = 300;
+		timer.Elapsed += async (sender, e) =>
+		{
+			textRemoved = true;
+			timer.Stop();
+			await InvokeAsync(() => { StateHasChanged(); });
+		};
+	}
+
+	protected override async Task OnParametersSetAsync()
+	{
+		await base.OnParametersSetAsync();
+		textRemoved = false;
+		// timer.Start();
+	}
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		await base.OnAfterRenderAsync(firstRender);
+		if (firstRender)
+		{
+			beforeFirstRender = false;
+			await Task.Delay(100);
+			StateHasChanged();
+		}
+	}
+}

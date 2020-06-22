@@ -1,0 +1,63 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29613.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhotoLabeler", "PhotoLabeler\PhotoLabeler.csproj", "{F8A3FB5E-FA6E-4C10-9E63-E0DCD8E593ED}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhotoLabeler.Console", "PhotoLabeler.Console\PhotoLabeler.Console.csproj", "{6B81899C-571B-4C15-B4E0-FAC503D12CF3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhotoLabeler.Components", "PhotoLabeler.Components\PhotoLabeler.Components.csproj", "{CDF71F84-0725-4859-A172-9D772834D413}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhotoLabeler.Entities", "PhotoLabeler.Entities\PhotoLabeler.Entities.csproj", "{59A30F27-0735-476C-ABE1-8F74F353DDAC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhotoLabeler.ServiceLibrary", "PhotoLabeler.ServiceLibrary\PhotoLabeler.ServiceLibrary.csproj", "{BD7C5BF0-BCF4-4CBC-AF18-D38A71682752}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Lib", "Lib", "{1DDB4502-27C8-45AA-B7C0-872CB8D150E3}"
+	ProjectSection(SolutionItems) = preProject
+		..\lib\MetadataExtractor.deps.json = ..\lib\MetadataExtractor.deps.json
+		..\lib\MetadataExtractor.dll = ..\lib\MetadataExtractor.dll
+		..\lib\MetadataExtractor.pdb = ..\lib\MetadataExtractor.pdb
+		..\lib\MetadataExtractor.xml = ..\lib\MetadataExtractor.xml
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhotoLabeler.Data", "PhotoLabeler.Data\PhotoLabeler.Data.csproj", "{45F73CB1-8383-4A53-AFE8-1E421A512CD0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F8A3FB5E-FA6E-4C10-9E63-E0DCD8E593ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8A3FB5E-FA6E-4C10-9E63-E0DCD8E593ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8A3FB5E-FA6E-4C10-9E63-E0DCD8E593ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8A3FB5E-FA6E-4C10-9E63-E0DCD8E593ED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6B81899C-571B-4C15-B4E0-FAC503D12CF3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B81899C-571B-4C15-B4E0-FAC503D12CF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B81899C-571B-4C15-B4E0-FAC503D12CF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B81899C-571B-4C15-B4E0-FAC503D12CF3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CDF71F84-0725-4859-A172-9D772834D413}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CDF71F84-0725-4859-A172-9D772834D413}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CDF71F84-0725-4859-A172-9D772834D413}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CDF71F84-0725-4859-A172-9D772834D413}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59A30F27-0735-476C-ABE1-8F74F353DDAC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59A30F27-0735-476C-ABE1-8F74F353DDAC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59A30F27-0735-476C-ABE1-8F74F353DDAC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59A30F27-0735-476C-ABE1-8F74F353DDAC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BD7C5BF0-BCF4-4CBC-AF18-D38A71682752}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD7C5BF0-BCF4-4CBC-AF18-D38A71682752}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD7C5BF0-BCF4-4CBC-AF18-D38A71682752}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD7C5BF0-BCF4-4CBC-AF18-D38A71682752}.Release|Any CPU.Build.0 = Release|Any CPU
+		{45F73CB1-8383-4A53-AFE8-1E421A512CD0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{45F73CB1-8383-4A53-AFE8-1E421A512CD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{45F73CB1-8383-4A53-AFE8-1E421A512CD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{45F73CB1-8383-4A53-AFE8-1E421A512CD0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9D54D711-CC70-46A7-831F-29BF5364242A}
+	EndGlobalSection
+EndGlobal

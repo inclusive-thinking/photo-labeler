@@ -1,0 +1,99 @@
+﻿@inherits ComponentBase
+@implements IDisposable
+@inject NavigationManager NavigationManager
+@inject IJSRuntime jsRuntime
+
+@code
+{
+	private bool shouldFocusAFterRendering = false;
+	
+	private readonly string titleBase = "Photo labeler";
+
+	private string querySelectorToFocusAfterRendering;
+	
+	public string QuerySelectorToFocusAfterRendering
+	{
+		get
+		{
+			return querySelectorToFocusAfterRendering;
+		}
+		set
+		{
+			querySelectorToFocusAfterRendering = value;
+			shouldFocusAFterRendering = true;
+		}
+	}
+
+	protected string Title { get; set; }
+
+	internal void RefreshPage()
+	{
+		StateHasChanged();
+	}
+
+	protected override void OnInitialized()
+	{
+		base.OnInitialized();
+		NavigationManager.LocationChanged += LocationChanged;
+		shouldFocusAFterRendering = true;
+	}
+
+	/// <summary>
+	/// Method invoked after each time the component has been rendered. Note that the component does
+	/// not automatically re-render after the completion of any returned <see cref="T:System.Threading.Tasks.Task" />, because
+	/// that would cause an infinite render loop.
+	/// </summary>
+	/// <returns>
+	/// A <see cref="T:System.Threading.Tasks.Task" /> representing any asynchronous operation, or <see langword="null" />.
+	/// </returns>
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		await base.OnAfterRenderAsync(firstRender);
+
+		if (!string.IsNullOrWhiteSpace(this.Title))
+		{
+			await jsRuntime.InvokeVoidAsync("interopFunctions .setTitle", $"{this.Title} - {this.titleBase}");
+		}
+		await DoDefaultFocus();
+	}
+	/// <summary>
+	/// Perform focus on specified element, or, if it isn't specified, do focus in first header of level 2.
+	/// </summary>
+	/// <returns></returns>
+	public async Task DoDefaultFocus()
+	{
+		if (!shouldFocusAFterRendering)
+		{
+			return;
+		}
+		if (!string.IsNullOrWhiteSpace(this.QuerySelectorToFocusAfterRendering))
+		{
+			await jsRuntime.InvokeVoidAsync("interopFunctions.focusByQuerySelector", this.QuerySelectorToFocusAfterRendering);
+		}
+		else
+		{
+			await jsRuntime.InvokeVoidAsync("interopFunctions.focusInHeader", 2);
+		}
+		shouldFocusAFterRendering = false;
+	}
+
+	/// <summary>
+	/// Method executed when location changes.
+	/// </summary>
+	/// <param name="sender">The sender.</param>
+	/// <param name="location">The location.</param>
+	private void LocationChanged(object sender, LocationChangedEventArgs e)
+	{
+		shouldFocusAFterRendering = true;
+	}
+
+	/// <summary>
+	/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+	/// </summary>
+	public virtual void Dispose()
+	{
+		NavigationManager.LocationChanged -= LocationChanged;
+	}
+
+
+}
