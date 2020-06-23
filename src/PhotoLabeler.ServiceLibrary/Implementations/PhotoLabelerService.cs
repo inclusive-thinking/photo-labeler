@@ -19,7 +19,9 @@ namespace PhotoLabeler.ServiceLibrary.Implementations
 	public class PhotoLabelerService : IPhotoLabelerService
 	{
 
-		private readonly string _quickTimeMetadataDescriptionTag = "Description";
+		private const string QuickTimeMetadataDescriptionTag = "Description";
+
+		private const string QuickTimeMetaDataCreationDateTag = "Creation Date";
 
 		private const int MaxFileNameLength = 260;
 
@@ -250,7 +252,7 @@ namespace PhotoLabeler.ServiceLibrary.Implementations
 			var quickTimeMeta = data.SingleOrDefault(d => d.Name == "QuickTime Metadata Header");
 			if (quickTimeMeta != null)
 			{
-				var descriptionTag = quickTimeMeta.Tags.SingleOrDefault(t => t.Name == _quickTimeMetadataDescriptionTag);
+				var descriptionTag = quickTimeMeta.Tags.SingleOrDefault(t => t.Name == QuickTimeMetadataDescriptionTag);
 				if (descriptionTag != null)
 				{
 					var value = (StringValue)quickTimeMeta.GetObject(descriptionTag.Type);
@@ -272,7 +274,7 @@ namespace PhotoLabeler.ServiceLibrary.Implementations
 
 		private void AddQuickTimeMetaCreationDate(MetadataExtractor.Directory quickTimeMeta, Photo photo)
 		{
-			var tag = quickTimeMeta.Tags.SingleOrDefault(t => t.Name == "creationdate");
+			var tag = quickTimeMeta.Tags.SingleOrDefault(t => t.Name == QuickTimeMetaDataCreationDateTag);
 			if (tag != null)
 			{
 				var tagValue = (StringValue)quickTimeMeta.GetObject(tag.Type);
