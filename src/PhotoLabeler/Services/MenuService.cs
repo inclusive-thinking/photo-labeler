@@ -97,7 +97,7 @@ namespace PhotoLabeler.Services
 							{
 								Label = _localizer["Exit"],
 								Role = MenuRole.close,
-								Accelerator = "Alt+F4"
+								Click = () => { Electron.App.Quit(); }
 							},
 						},
 					},

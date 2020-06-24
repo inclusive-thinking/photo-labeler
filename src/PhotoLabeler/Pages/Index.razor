@@ -86,8 +86,7 @@
 
 	private void ExitApp()
 	{
-		var mainWindow = Electron.WindowManager.BrowserWindows.First();
-		mainWindow.Close();
+		Electron.App.Quit();
 	}
 
 	private async Task Item_Selected(TreeViewItem<Photo> item)
