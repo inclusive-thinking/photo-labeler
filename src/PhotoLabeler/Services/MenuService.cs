@@ -96,8 +96,7 @@ namespace PhotoLabeler.Services
 							new MenuItem
 							{
 								Label = _localizer["Exit"],
-								Role = MenuRole.close,
-								Click = () => { Electron.App.Quit(); }
+								Role = MenuRole.quit,
 							},
 						},
 					},
