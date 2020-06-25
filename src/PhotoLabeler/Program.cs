@@ -1,20 +1,15 @@
+// Copyright (c) Juanjo Montiel and contributors. All Rights Reserved. Licensed under the GNU General Public License, Version 2.0. See LICENSE in the project root for license information.
+
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-
 using ElectronNET.API;
-
-using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace PhotoLabeler
 {
-	public class Program
+	public static class Program
 	{
 		public static void Main(string[] args)
 		{
@@ -27,6 +22,16 @@ namespace PhotoLabeler
 			{
 				webBuilder.UseStartup<Startup>();
 				webBuilder.UseElectron(args);
+			})
+			.ConfigureLogging(logging =>
+			{
+				logging.ClearProviders();
+				logging.SetMinimumLevel(LogLevel.Debug);
+			})
+			//Añadimos Serilog obteniendo la configuración desde Microsoft.Extensions.Configuration
+			.UseSerilog((HostBuilderContext context, LoggerConfiguration loggerConfiguration) =>
+			{
+				loggerConfiguration.ReadFrom.Configuration(context.Configuration);
 			});
 	}
 }

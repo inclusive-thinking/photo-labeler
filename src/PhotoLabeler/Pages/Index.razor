@@ -4,6 +4,7 @@
 @using ElectronNET.API
 @using ElectronNET.API.Entities
 @using Microsoft.AspNetCore.Components
+@using Serilog
 @using PhotoLabeler.Constants
 @using PhotoLabeler.Components
 @using PhotoLabeler.Interfaces
@@ -12,6 +13,7 @@
 @using PhotoLabeler.Components.Extensions
 @using PhotoLabeler.Data.Interfaces.Repositories
 @inject IJSRuntime jsRuntime
+@inject ILogger   logger
 @inject IPhotoLabelerService photoLabelerService
 @inject PhotoLabeler.Data.Repositories.Interfaces.IAppConfigRepository appConfigRepository
 @inject IMenuService menuService
@@ -65,22 +67,33 @@
 
 	private async Task SelectDirectory()
 	{
-		var mainWindow = Electron.WindowManager.BrowserWindows.First();
-		var options = new OpenDialogOptions
+		try
 		{
-			Properties = new OpenDialogProperty[] {
+			var mainWindow = Electron.WindowManager.BrowserWindows.First();
+			var options = new OpenDialogOptions
+			{
+				Properties = new OpenDialogProperty[] {
 			OpenDialogProperty.openDirectory,
 		},
-			Title = localizer["Choose the directory which contains the photos"]
-		};
-		string[] files = await Electron.Dialog.ShowOpenDialogAsync(mainWindow, options);
-		if (files.Length > 0)
+				Title = localizer["Choose the directory which contains the photos"]
+			};
+			string[] files = await Electron.Dialog.ShowOpenDialogAsync(mainWindow, options);
+			if (files.Length > 0)
+			{
+				selectedFile = files[0];
+				statusText = localizer["Loading directories..."];
+				treeViewItems = await photoLabelerService.GetPhotosFromDirAsync(selectedFile);
+				statusText = localizer["Directories loaded"];
+				QuerySelectorToFocusAfterRendering = "#treeViewPhotos [tabindex=\"0\"]";
+			}
+		}
+		catch (Exception ex)
 		{
-			selectedFile = files[0];
-			statusText = localizer["Loading directories..."];
-			treeViewItems = await photoLabelerService.GetPhotosFromDirAsync(selectedFile);
-			statusText = localizer["Directories loaded"];
-			QuerySelectorToFocusAfterRendering = "#treeViewPhotos [tabindex=\"0\"]";
+			logger.Error(ex, "Error when opening a folder.");
+			_ = await Electron.Dialog.ShowMessageBoxAsync(new MessageBoxOptions(localizer["Error when opening the folder: {0}", ex.Message])
+			{
+				Type = MessageBoxType.error
+			});
 		}
 	}
 

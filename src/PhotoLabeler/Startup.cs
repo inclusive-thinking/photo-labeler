@@ -10,7 +10,6 @@ using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using PhotoLabeler.Data.Interfaces.Repositories;
 using PhotoLabeler.Data.Repositories.Interfaces;
 using PhotoLabeler.Interfaces;
@@ -55,11 +54,6 @@ namespace PhotoLabeler
 			});
 			services.AddSingleton<IPhotoLabelerService, PhotoLabelerService>();
 			services.AddSingleton<IMenuService, MenuService>();
-			services.AddLogging(opt =>
-			{
-				opt.AddConsole()
-				.AddDebug();
-			});
 			services.AddSingleton<IDbConnection>((serviceProvider) =>
 			{
 				var connectionStringBuilder = new SqliteConnectionStringBuilder { DataSource = "./appconfig.db" };

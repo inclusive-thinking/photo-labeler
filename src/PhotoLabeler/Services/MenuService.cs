@@ -1,18 +1,15 @@
 ﻿// Copyright (c) Juanjo Montiel and contributors. All Rights Reserved. Licensed under the GNU General Public License, Version 2.0. See LICENSE in the project root for license information.
 
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Threading.Tasks;
 using ElectronNET.API;
 using ElectronNET.API.Entities;
-
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Localization;
 using PhotoLabeler.Entities;
 using PhotoLabeler.Interfaces;
-
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace PhotoLabeler.Services
 {
@@ -25,10 +22,6 @@ namespace PhotoLabeler.Services
 		private readonly IStringLocalizer<MenuService> _localizer;
 
 		private readonly RequestLocalizationOptions _localizationOptions;
-
-		private List<MenuItem> _menuItems = null;
-
-		private List<MenuItem> _languageMenuItems = null;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="MenuService" /> class.
@@ -76,7 +69,6 @@ namespace PhotoLabeler.Services
 					};
 					languageMenuItems.Add(languageItem);
 				}
-				_languageMenuItems = languageMenuItems.ToList();
 
 				var menuItems = new MenuItem[]
 				{
@@ -107,7 +99,6 @@ namespace PhotoLabeler.Services
 						Submenu = languageMenuItems.ToArray()
 					}
 				};
-				_menuItems = menuItems.ToList();
 				Electron.Menu.SetApplicationMenu(menuItems);
 			}
 		}
