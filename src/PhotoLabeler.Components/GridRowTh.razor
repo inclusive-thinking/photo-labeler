@@ -1,0 +1,10 @@
+﻿<th aria-sort="@(HeaderCell.Order == Entities.Grid.Order.Ascending ? "ascending" : "descending")"
+    tabindex="@(HeaderCell.Selected?"0":"-1")"
+>			
+    @ChildContent
+</th>
+@code
+{
+	[Parameter] public Entities.Grid.GridHeaderCell HeaderCell {get; set; }
+    [Parameter] public RenderFragment ChildContent {get; set; }
+}

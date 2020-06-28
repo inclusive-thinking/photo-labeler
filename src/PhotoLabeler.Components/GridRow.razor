@@ -1,0 +1,23 @@
+﻿<tr>
+	@foreach (var cell in Row.Cells)
+	{
+		@if (cell is Entities.Grid.GridHeaderCell headerCell)
+		{
+			<GridRowTh HeaderCell=headerCell>
+				<GridRowCellContent Cell=cell />
+			</GridRowTh>
+		}
+		else
+		{
+			<td>
+				<GridRowCellContent Cell=cell />
+			</td>
+		}
+	}
+</tr>
+
+@code
+{
+	[Parameter] public Entities.Grid.GridRow Row {get; set; }
+}
+

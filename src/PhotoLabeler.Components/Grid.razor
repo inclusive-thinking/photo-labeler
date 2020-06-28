@@ -1,154 +1,15 @@
-﻿@using  Microsoft.AspNetCore.Components.Rendering
-@using Microsoft.AspNetCore.Components.Web
-@using  Microsoft.JSInterop
-@using PhotoLabeler.Components.Extensions
-@inject IJSRuntime  jsRuntime
-<table role="grid" id="@Id">
+﻿<table role="grid" id="@Id">
 	@if (!string.IsNullOrWhiteSpace(Model.Caption))
 	{
 		<caption>@Model.Caption</caption>
 	}
 	<thead>
-		@RenderRow(Model.Header.Row)
+		<GridRow Row="@Model.Header.Row" />
 	</thead>
 	<tbody>
 		@foreach (var row in Model.Body.Rows.Where(r => r.Visible))
 		{
-			@RenderRow(row)
+			<GridRow Row="@row" />
 		}
 	</tbody>
 </table>
-
-@code
-{
-
-	[Parameter]
-	public Entities.Grid Model { get; set; }
-
-	[Parameter]
-	public string Id { get; set; } = Guid.NewGuid().ToString();
-
-	private bool focusOnItemAfterRender = false;
-
-	private void RenderCell(RenderTreeBuilder builder, Entities.Grid.GridCell cell)
-	{
-		if (cell is Entities.Grid.GridHeaderCell headerCell)
-		{
-			var attributeNumber = 1;
-			builder.OpenElement(cell.CellIndex, "th");
-			if (headerCell.Order != Entities.Grid.Order.Default)
-			{
-				builder.AddAttribute(attributeNumber++, "aria-sort", (headerCell.Order == Entities.Grid.Order.Ascending ? "ascending" : "descending"));
-			}
-			if (headerCell.Selected)
-			{
-				builder.AddAttribute(attributeNumber++, "tabindex", "0");
-			}
-		}
-		else
-		{
-			builder.OpenElement(cell.CellIndex, "td");
-		}
-		if (!string.IsNullOrWhiteSpace(cell.Link))
-		{
-			builder.OpenElement(1, "a");
-			builder.AddAttribute(1, "href", cell.Link);
-			builder.AddAttribute(2, "onkeydown", EventCallback.Factory.Create(this, (KeyboardEventArgs e) =>
-			{
-				Item_KeyDown(cell, e);
-			}
-		));
-			if (cell.Selected)
-			{
-				builder.AddAttribute(3, "tabindex", "0");
-			}
-			builder.AddContent(1, cell.Text);
-			builder.CloseElement();
-		}
-		else
-		{
-			builder.AddAttribute(1, "onkeydown", EventCallback.Factory.Create(this, (KeyboardEventArgs e) =>
-			{
-				Item_KeyDown(cell, e);
-			}
-		));
-			if (cell.Selected)
-			{
-				builder.AddAttribute(2, "tabindex", "0");
-			}
-			builder.AddContent(1, cell.Text);
-		}
-		builder.CloseElement();
-	}
-
-	private RenderFragment RenderRow(Entities.Grid.GridRow row)
-	{
-		RenderFragment fragment = (builder) =>
-		{
-			builder.OpenElement(row.RowIndex, "tr");
-			foreach (var cell in row.Cells)
-			{
-				RenderCell(builder, cell);
-			}
-			builder.CloseElement();
-		};
-		return fragment;
-	}
-
-	protected override async Task OnAfterRenderAsync(bool firstRender)
-	{
-		await base.OnAfterRenderAsync(firstRender);
-		if (focusOnItemAfterRender)
-		{
-			await jsRuntime.InvokeVoidAsync("jsInteropFunctions.focusSelectedItemInsideContainer", this.Id);
-		}
-	}
-
-	private void Item_KeyDown(Entities.Grid.GridCell cell, KeyboardEventArgs e)
-	{
-		focusOnItemAfterRender = false;
-		Entities.Grid.GridCell newSelectedCell = null;
-
-		switch (e.Key)
-		{
-			case "ArrowLeft":
-				if (cell.CellIndex == 0)
-				{
-					return;
-				}
-				newSelectedCell = cell.Row.Cells[cell.CellIndex - 1];
-				break;
-			case "ArrowRight":
-				if (cell.CellIndex == cell.Row.Cells.Count - 1)
-				{
-					return;
-				}
-				newSelectedCell = cell.Row.Cells[cell.CellIndex + 1];
-				break;
-			case "ArrowUp":
-				var previousRow = cell.Row.GetPreviousRow();
-				if (previousRow == null)
-				{
-					return;
-				}
-				newSelectedCell = previousRow.Cells[cell.CellIndex];
-				break;
-			case "ArrowDown":
-				var nextRow = cell.Row.GetNextRow();
-				if (nextRow == null)
-				{
-					return;
-				}
-				newSelectedCell = nextRow.Cells[cell.CellIndex];
-				break;
-			default:
-				break;
-		}
-		if (newSelectedCell != null)
-		{
-			newSelectedCell.Selected = true;
-			cell.Selected = false;
-			focusOnItemAfterRender = true;
-		}
-	}
-}
