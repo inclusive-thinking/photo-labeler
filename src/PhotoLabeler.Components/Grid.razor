@@ -4,12 +4,12 @@
 		<caption>@Model.Caption</caption>
 	}
 	<thead>
-		<GridRow Row="@Model.Header.Row" />
+		<GridRow Row="@Model.Header.Row" RefreshGrid="@RefreshGrid" />
 	</thead>
 	<tbody>
 		@foreach (var row in Model.Body.Rows.Where(r => r.Visible))
 		{
-			<GridRow Row="@row" />
+			<GridRow Row="@row"  RefreshGrid="@RefreshGrid"/>
 		}
 	</tbody>
 </table>

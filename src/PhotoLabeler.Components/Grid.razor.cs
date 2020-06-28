@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
@@ -17,8 +18,6 @@ namespace PhotoLabeler.Components
         public string Id { get; set; } = Guid.NewGuid().ToString();
 
         private bool focusOnItemAfterRender = false;
-       
-
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);
@@ -27,7 +26,10 @@ namespace PhotoLabeler.Components
                 await jsRuntime.InvokeVoidAsync("jsInteropFunctions.focusSelectedItemInsideContainer", this.Id);
             }
         }
-
-
+        private void RefreshGrid(bool focus)
+        {
+            focusOnItemAfterRender = focus;
+            InvokeAsync( () => StateHasChanged() );
+        }
     }
 }

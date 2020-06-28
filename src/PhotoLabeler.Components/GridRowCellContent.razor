@@ -1,17 +1,19 @@
 ﻿@using PhotoLabeler.Components.Extensions;
+@using Microsoft.AspNetCore.Components.Web;
 
 @if (!string.IsNullOrWhiteSpace(Cell.Link))
 {
     <a href="@Cell.Link" 
-    @onkeydown="Item_KeyDown" 
-    tabindex="@( Cell.Selected?"0":"-1")"
+       @onkeydown="@( (KeyboardEventArgs e) => Item_KeyDown(e) )" 
+       tabindex="@( Cell.Selected?"0":"-1")"
     >
         @Cell.Text
     </a>
 }
 else
 {
-    <span tabindex="@( Cell.Selected?"0":"-1")">
+    <span @onkeydown="@( (KeyboardEventArgs e) => Item_KeyDown(e) )" 
+          tabindex="@( Cell.Selected?"0":"-1")">
         @Cell.Text
     </span>
 }
@@ -20,10 +22,10 @@ else
 {
     [Parameter] public Entities.Grid.GridCell Cell { get; set; }
     [Parameter] public RenderFragment fragment { get; set; }
+	[Parameter] public Action<bool> RefreshGrid {get; set; }
 
-    private void Item_KeyDown(Microsoft.AspNetCore.Components.Web.KeyboardEventArgs e)
+    private void Item_KeyDown(KeyboardEventArgs e)
     {
-        // focusOnItemAfterRender = false;
         Entities.Grid.GridCell newSelectedCell = null;
 
         switch (e.Key)
@@ -61,12 +63,15 @@ else
             default:
                 break;
         }
+
+        
         if (newSelectedCell != null)
-        {
+        {            
             newSelectedCell.Selected = true;
             Cell.Selected = false;
-            // focusOnItemAfterRender = true;
+            RefreshGrid(newSelectedCell != null);
         }
+        
     }
 
 }
