@@ -20,15 +20,15 @@ namespace PhotoLabeler
 			Host.CreateDefaultBuilder(args)
 			.ConfigureWebHostDefaults(webBuilder =>
 			{
-				webBuilder.UseStartup<Startup>();
 				webBuilder.UseElectron(args);
+				webBuilder.UseStartup<Startup>();
 			})
 			.ConfigureLogging(logging =>
 			{
 				logging.ClearProviders();
 				logging.SetMinimumLevel(LogLevel.Debug);
 			})
-			//Añadimos Serilog obteniendo la configuración desde Microsoft.Extensions.Configuration
+			//AÃ±adimos Serilog obteniendo la configuraciÃ³n desde Microsoft.Extensions.Configuration
 			.UseSerilog((HostBuilderContext context, LoggerConfiguration loggerConfiguration) =>
 			{
 				loggerConfiguration.ReadFrom.Configuration(context.Configuration);
