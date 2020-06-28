@@ -26,6 +26,7 @@ else
 
     private void Item_KeyDown(KeyboardEventArgs e)
     {
+        var focus = false;
         Entities.Grid.GridCell newSelectedCell = null;
 
         switch (e.Key)
@@ -69,8 +70,10 @@ else
         {            
             newSelectedCell.Selected = true;
             Cell.Selected = false;
-            RefreshGrid(newSelectedCell != null);
+            focus = newSelectedCell != null;
+            
         }
+        RefreshGrid(focus);
         
     }
 
