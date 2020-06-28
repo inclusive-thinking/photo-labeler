@@ -8,8 +8,8 @@ namespace PhotoLabeler.Components
 {
     public partial class Grid
     {
-        [Inject] 
-		public IJSRuntime jsRuntime { get; set; }
+        [Inject]
+        public IJSRuntime jsRuntime { get; set; }
 
         [Parameter]
         public Entities.Grid Model { get; set; }
@@ -29,7 +29,7 @@ namespace PhotoLabeler.Components
         private void RefreshGrid(bool focus)
         {
             focusOnItemAfterRender = focus;
-            InvokeAsync( () => StateHasChanged() );
+            InvokeAsync(() => StateHasChanged());
         }
     }
 }

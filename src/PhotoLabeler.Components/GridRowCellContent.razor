@@ -22,7 +22,7 @@ else
 {
     [Parameter] public Entities.Grid.GridCell Cell { get; set; }
     [Parameter] public RenderFragment fragment { get; set; }
-	[Parameter] public Action<bool> RefreshGrid {get; set; }
+    [Parameter] public Action<bool> RefreshGrid { get; set; }
 
     private void Item_KeyDown(KeyboardEventArgs e)
     {
@@ -65,16 +65,16 @@ else
                 break;
         }
 
-        
+
         if (newSelectedCell != null)
-        {            
+        {
             newSelectedCell.Selected = true;
             Cell.Selected = false;
             focus = newSelectedCell != null;
-            
+
         }
         RefreshGrid(focus);
-        
+
     }
 
 }
