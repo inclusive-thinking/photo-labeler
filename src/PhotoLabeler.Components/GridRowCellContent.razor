@@ -1,0 +1,82 @@
+﻿@using PhotoLabeler.Components.Extensions;
+@using Microsoft.AspNetCore.Components.Web;
+
+@if (!string.IsNullOrWhiteSpace(Cell.Link))
+{
+    <a href="@Cell.Link" 
+       @onkeydown="@( (KeyboardEventArgs e) => Item_KeyDown(e) )" 
+       tabindex="@( Cell.Selected?"0":"-1")"
+    >
+        @Cell.Text
+    </a>
+}
+else
+{
+    <span @onkeydown="@( (KeyboardEventArgs e) => Item_KeyDown(e) )" 
+          tabindex="@( Cell.Selected?"0":"-1")">
+        @Cell.Text
+    </span>
+}
+
+@code
+{
+    [Parameter] public Entities.Grid.GridCell Cell { get; set; }
+    [Parameter] public RenderFragment fragment { get; set; }
+    [Parameter] public Action<bool> RefreshGrid { get; set; }
+
+    private void Item_KeyDown(KeyboardEventArgs e)
+    {
+        var focus = false;
+        Entities.Grid.GridCell newSelectedCell = null;
+
+        switch (e.Key)
+        {
+            case "ArrowLeft":
+                if (Cell.CellIndex == 0)
+                {
+                    return;
+                }
+                newSelectedCell = Cell.Row.Cells[Cell.CellIndex - 1];
+                break;
+            case "ArrowRight":
+                if (Cell.CellIndex == Cell.Row.Cells.Count - 1)
+                {
+                    return;
+                }
+                newSelectedCell = Cell.Row.Cells[Cell.CellIndex + 1];
+                break;
+            case "ArrowUp":
+                var previousRow = Cell.Row.GetPreviousRow();
+                if (previousRow == null)
+                {
+                    return;
+                }
+                newSelectedCell = previousRow.Cells[Cell.CellIndex];
+                break;
+            case "ArrowDown":
+                var nextRow = Cell.Row.GetNextRow();
+                if (nextRow == null)
+                {
+                    return;
+                }
+                newSelectedCell = nextRow.Cells[Cell.CellIndex];
+                break;
+            default:
+                break;
+        }
+
+
+        if (newSelectedCell != null)
+        {
+            newSelectedCell.Selected = true;
+            Cell.Selected = false;
+            focus = newSelectedCell != null;
+
+        }
+        RefreshGrid(focus);
+
+    }
+
+}
+
+

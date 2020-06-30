@@ -1,0 +1,24 @@
+﻿<tr>
+	@foreach (var cell in Row.Cells)
+	{
+		@if (cell is Entities.Grid.GridHeaderCell headerCell)
+		{
+			<GridRowTh HeaderCell=headerCell>
+				<GridRowCellContent Cell=cell RefreshGrid="RefreshGrid" />
+			</GridRowTh>
+		}
+		else
+		{
+			<td>
+				<GridRowCellContent Cell=cell RefreshGrid="RefreshGrid" />
+			</td>
+		}
+	}
+</tr>
+
+@code
+{
+    [Parameter] public Entities.Grid.GridRow Row { get; set; }
+    [Parameter] public Action<bool> RefreshGrid { get; set; }
+}
+
