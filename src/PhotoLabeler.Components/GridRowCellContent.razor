@@ -1,7 +1,7 @@
 ﻿@using PhotoLabeler.Components.Extensions;
 @using Microsoft.AspNetCore.Components.Web;
 
-@if (!string.IsNullOrWhiteSpace(Cell.Link))
+@if (Cell is PhotoLabeler.Entities.Grid.GridCellLink)
 {
     <a href="@Cell.Link" 
        @onkeydown="@( (KeyboardEventArgs e) => Item_KeyDown(e) )" 
@@ -10,7 +10,15 @@
         @Cell.Text
     </a>
 }
-else
+else if (Cell is PhotoLabeler.Entities.Grid.GridCellPict) 
+{
+    @( $"file://{Cell.Text}" )
+    <img @onkeydown="@( (KeyboardEventArgs e) => Item_KeyDown(e) )" 
+          tabindex="@( Cell.Selected?"0":"-1")"
+          src="@( $"file://{Cell.Text}" )"
+    />
+}
+else 
 {
     <span @onkeydown="@( (KeyboardEventArgs e) => Item_KeyDown(e) )" 
           tabindex="@( Cell.Selected?"0":"-1")">
@@ -65,14 +73,10 @@ else
                 break;
         }
 
-
-        if (newSelectedCell != null)
-        {
-            newSelectedCell.Selected = true;
-            Cell.Selected = false;
-            focus = newSelectedCell != null;
-
-        }
+        newSelectedCell ??= Cell;
+        Cell.Selected = false;
+        newSelectedCell.Selected = true;        
+        focus = newSelectedCell != null;
         RefreshGrid(focus);
 
     }
