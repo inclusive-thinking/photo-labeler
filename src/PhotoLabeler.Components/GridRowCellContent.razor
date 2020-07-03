@@ -33,7 +33,7 @@ else
     [Parameter] public Action<bool> RefreshGrid { get; set; }
 
     private void Item_KeyDown(KeyboardEventArgs e)
-    {
+    {       
         var focus = false;
         Entities.Grid.GridCell newSelectedCell = null;
 
@@ -73,9 +73,11 @@ else
                 break;
         }
 
-        newSelectedCell ??= Cell;
-        Cell.Selected = false;
-        newSelectedCell.Selected = true;        
+        if (newSelectedCell != null )
+        {
+            Cell.Selected = false;
+            newSelectedCell.Selected = true;                    
+        }
         focus = newSelectedCell != null;
         RefreshGrid(focus);
 
