@@ -13,7 +13,9 @@ using Microsoft.Extensions.Localization;
 using PhotoLabeler.Entities;
 using PhotoLabeler.ServiceLibrary.Exceptions;
 using PhotoLabeler.ServiceLibrary.Interfaces;
-
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp.Processing;
 namespace PhotoLabeler.ServiceLibrary.Implementations
 {
     public class PhotoLabelerService : IPhotoLabelerService
@@ -133,6 +135,7 @@ namespace PhotoLabeler.ServiceLibrary.Implementations
             }
         }
 
+
         /// <summary>
         /// Gets the grid from TreeView item asynchronous.
         /// </summary>
@@ -175,13 +178,30 @@ namespace PhotoLabeler.ServiceLibrary.Implementations
             {
                 var row = new Grid.GridRow(rowIndex: grid.Body.Rows.Count, grid);
 
-				//
-                var pictCell = new Grid.GridCellPict(cellIndex: row.Cells.Count,row: row, grid: grid)
+                //
+                var img = "";
+                var postedFileExtension = Path.GetExtension(photo.Path);
+                var isImage = (string.Equals(postedFileExtension, ".jpg", StringComparison.OrdinalIgnoreCase)
+                                || string.Equals(postedFileExtension, ".png", StringComparison.OrdinalIgnoreCase)
+                                || string.Equals(postedFileExtension, ".gif", StringComparison.OrdinalIgnoreCase)
+                                || string.Equals(postedFileExtension, ".bmp", StringComparison.OrdinalIgnoreCase)
+                                || string.Equals(postedFileExtension, ".jpeg", StringComparison.OrdinalIgnoreCase));
+                if (isImage)
                 {
-                    Text = photo.Path
+                    using (var image = Image.Load(photo.Path))
+                    {
+                        image.Mutate(x => x
+                            .Resize(100, 100)
+                            );
+                        img = image.ToBase64String(JpegFormat.Instance);
+                    }
+                }
+
+                var pictCell = new Grid.GridCellPict(cellIndex: row.Cells.Count, row: row, grid: grid)
+                {
+                    Text = img
                 };
                 row.Cells.Add(pictCell);
-
 
                 //
                 var labelCell = new Grid.GridCellLabel(cellIndex: row.Cells.Count, row: row, grid: grid)

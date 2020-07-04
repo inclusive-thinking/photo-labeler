@@ -12,11 +12,19 @@
 }
 else if (Cell is PhotoLabeler.Entities.Grid.GridCellPict) 
 {
-    @( $"file://{Cell.Text}" )
-    <img @onkeydown="@( (KeyboardEventArgs e) => Item_KeyDown(e) )" 
-          tabindex="@( Cell.Selected?"0":"-1")"
-          src="@( $"file://{Cell.Text}" )"
-    />
+    if (!String.IsNullOrEmpty(Cell.Text)) 
+    {        
+        <img @onkeydown="@( (KeyboardEventArgs e) => Item_KeyDown(e) )" 
+            tabindex="@( Cell.Selected?"0":"-1")"
+            src="@Cell.Text"
+            style="width: 100px; heigh: 100px;"
+        />
+    }
+    else
+    {
+
+    }
+
 }
 else 
 {
@@ -33,7 +41,7 @@ else
     [Parameter] public Action<bool> RefreshGrid { get; set; }
 
     private void Item_KeyDown(KeyboardEventArgs e)
-    {       
+    {
         var focus = false;
         Entities.Grid.GridCell newSelectedCell = null;
 
@@ -73,10 +81,10 @@ else
                 break;
         }
 
-        if (newSelectedCell != null )
+        if (newSelectedCell != null)
         {
             Cell.Selected = false;
-            newSelectedCell.Selected = true;                    
+            newSelectedCell.Selected = true;
         }
         focus = newSelectedCell != null;
         RefreshGrid(focus);
