@@ -19,12 +19,12 @@ namespace PhotoLabeler.Console
 			{
 				var latitudeTag = gpsData.Tags.SingleOrDefault(t => t.Name == "GPS Latitude");
 				var longitudeTag = gpsData.Tags.SingleOrDefault(t => t.Name == "GPS Longitude");
-				var altitudeTag = gpsData.Tags.SingleOrDefault(t => t.Name == "GPS Altitude"); 
+				var altitudeTag = gpsData.Tags.SingleOrDefault(t => t.Name == "GPS Altitude");
 				if (latitudeTag != null)
 				{
 					var latitude = GetCoordinateFromDegrees(latitudeTag);
 				}
-				
+
 				if (longitudeTag != null)
 				{
 					var longitude = GetCoordinateFromDegrees(longitudeTag);

@@ -32,7 +32,7 @@ namespace PhotoLabeler.Components.Extensions
 			{
 				newRow = allRows[(direction == RowMovement.Up ? newIndex-- : newIndex++)];
 			} while (!newRow.Visible && newIndex >= 0 && newIndex <= allRows.Count - 1);
-			
+
 			if (!newRow.Visible)
 			{
 				return null;

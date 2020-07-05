@@ -1,8 +1,7 @@
-﻿using ElectronNET.API.Entities;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using ElectronNET.API.Entities;
 
 namespace PhotoLabeler.Entities
 {
