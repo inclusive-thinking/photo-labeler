@@ -14,6 +14,8 @@ using Microsoft.Extensions.Hosting;
 using PhotoLabeler.Data.Interfaces.Repositories;
 using PhotoLabeler.Data.Repositories.Interfaces;
 using PhotoLabeler.Interfaces;
+using PhotoLabeler.PhotoStorageReader.Implementations;
+using PhotoLabeler.PhotoStorageReader.Interfaces;
 using PhotoLabeler.ServiceLibrary.Implementations;
 using PhotoLabeler.ServiceLibrary.Interfaces;
 using PhotoLabeler.Services;
@@ -54,6 +56,7 @@ namespace PhotoLabeler
                 options.ResourcesPath = "Resources";
             });
             services.AddSingleton<IPhotoLabelerService, PhotoLabelerService>();
+            services.AddSingleton<IPhotoReader, PhotoReaderBase64>();        
             services.AddSingleton<IMenuService, MenuService>();
             services.AddSingleton<IDbConnection>((serviceProvider) =>
             {

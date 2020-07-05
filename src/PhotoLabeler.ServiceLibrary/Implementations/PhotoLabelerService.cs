@@ -11,6 +11,7 @@ using MetadataExtractor;
 using MetadataExtractor.Formats.Xmp;
 using Microsoft.Extensions.Localization;
 using PhotoLabeler.Entities;
+using PhotoLabeler.PhotoStorageReader.Interfaces;
 using PhotoLabeler.ServiceLibrary.Exceptions;
 using PhotoLabeler.ServiceLibrary.Interfaces;
 using SixLabors.ImageSharp;
@@ -28,14 +29,19 @@ namespace PhotoLabeler.ServiceLibrary.Implementations
         private const int MaxFileNameLength = 260;
 
         private readonly IStringLocalizer<PhotoLabelerService> _localizer;
+        private readonly IPhotoReader _photoReader;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PhotoLabelerService"/> class.
         /// </summary>
         /// <param name="localizer">The localizer.</param>
-        public PhotoLabelerService(IStringLocalizer<PhotoLabelerService> localizer)
+        public PhotoLabelerService(
+            IStringLocalizer<PhotoLabelerService> localizer,
+            IPhotoReader photoReader
+            )
         {
             _localizer = localizer;
+            _photoReader = photoReader;
         }
 
 
@@ -179,23 +185,7 @@ namespace PhotoLabeler.ServiceLibrary.Implementations
                 var row = new Grid.GridRow(rowIndex: grid.Body.Rows.Count, grid);
 
                 //
-                var img = "";
-                var postedFileExtension = Path.GetExtension(photo.Path);
-                var isImage = (string.Equals(postedFileExtension, ".jpg", StringComparison.OrdinalIgnoreCase)
-                                || string.Equals(postedFileExtension, ".png", StringComparison.OrdinalIgnoreCase)
-                                || string.Equals(postedFileExtension, ".gif", StringComparison.OrdinalIgnoreCase)
-                                || string.Equals(postedFileExtension, ".bmp", StringComparison.OrdinalIgnoreCase)
-                                || string.Equals(postedFileExtension, ".jpeg", StringComparison.OrdinalIgnoreCase));
-                if (isImage)
-                {
-                    using (var image = Image.Load(photo.Path))
-                    {
-                        image.Mutate(x => x
-                            .Resize(100, 100)
-                            );
-                        img = image.ToBase64String(JpegFormat.Instance);
-                    }
-                }
+                var img = _photoReader.GetImgSrc(photo.Path);
 
                 var pictCell = new Grid.GridCellPict(cellIndex: row.Cells.Count, row: row, grid: grid)
                 {
