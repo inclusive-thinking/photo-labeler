@@ -10,14 +10,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\metadata-extractor\MetadataExtractor\MetadataExtractor.csproj" />
     <ProjectReference Include="..\PhotoLabeler.Entities\PhotoLabeler.Entities.csproj" />
     <ProjectReference Include="..\PhotoLabeler.PhotoStorageReader\PhotoLabeler.PhtotoStorageReader.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="MetadataExtractor">
-      <HintPath>..\..\lib\MetadataExtractor.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
 </Project>
