@@ -1,0 +1,188 @@
+2020-06-29 17:02:56.122 +02:00 [DBG] Hosting starting
+2020-06-29 17:02:56.447 +02:00 [INF] User profile is available. Using 'C:\Users\jmontiel\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2020-06-29 17:02:56.534 +02:00 [DBG] Reading data from file 'C:\Users\jmontiel\AppData\Local\ASP.NET\DataProtection-Keys\key-a5268e7d-5d61-43b7-85a2-1b618e08a955.xml'.
+2020-06-29 17:02:56.573 +02:00 [DBG] Reading data from file 'C:\Users\jmontiel\AppData\Local\ASP.NET\DataProtection-Keys\key-bbecd459-7671-4a48-87c6-c8aec62ada06.xml'.
+2020-06-29 17:02:56.625 +02:00 [DBG] Found key "a5268e7d-5d61-43b7-85a2-1b618e08a955".
+2020-06-29 17:02:56.655 +02:00 [DBG] Found key "bbecd459-7671-4a48-87c6-c8aec62ada06".
+2020-06-29 17:02:56.695 +02:00 [DBG] Considering key "bbecd459-7671-4a48-87c6-c8aec62ada06" with expiration date "2020-07-24T23:29:16.0113775+00:00" as default key.
+2020-06-29 17:02:56.735 +02:00 [DBG] Forwarded activator type request from Microsoft.AspNetCore.DataProtection.XmlEncryption.DpapiXmlDecryptor, Microsoft.AspNetCore.DataProtection, Version=5.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60 to Microsoft.AspNetCore.DataProtection.XmlEncryption.DpapiXmlDecryptor, Microsoft.AspNetCore.DataProtection, Culture=neutral, PublicKeyToken=adb9793829ddae60
+2020-06-29 17:02:56.770 +02:00 [DBG] Decrypting secret element using Windows DPAPI.
+2020-06-29 17:02:56.791 +02:00 [DBG] Forwarded activator type request from Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel.AuthenticatedEncryptorDescriptorDeserializer, Microsoft.AspNetCore.DataProtection, Version=5.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60 to Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel.AuthenticatedEncryptorDescriptorDeserializer, Microsoft.AspNetCore.DataProtection, Culture=neutral, PublicKeyToken=adb9793829ddae60
+2020-06-29 17:02:56.854 +02:00 [DBG] Opening CNG algorithm 'AES' from provider 'null' with chaining mode CBC.
+2020-06-29 17:02:56.879 +02:00 [DBG] Opening CNG algorithm 'SHA256' from provider 'null' with HMAC.
+2020-06-29 17:02:56.910 +02:00 [DBG] Using key "bbecd459-7671-4a48-87c6-c8aec62ada06" as the default key.
+2020-06-29 17:02:56.928 +02:00 [DBG] Key ring with default key "bbecd459-7671-4a48-87c6-c8aec62ada06" was loaded during application startup.
+2020-06-29 17:02:57.605 +02:00 [DBG] Registered SignalR Protocol: json, implemented by Microsoft.AspNetCore.SignalR.Protocol.JsonHubProtocol.
+2020-06-29 17:02:57.723 +02:00 [DBG] Registered SignalR Protocol: blazorpack, implemented by Microsoft.AspNetCore.Components.Server.BlazorPack.BlazorPackHubProtocol.
+2020-06-29 17:02:59.009 +02:00 [DBG] Failed to locate the development https certificate at 'null'.
+2020-06-29 17:02:59.135 +02:00 [INF] Now listening on: http://localhost:5000
+2020-06-29 17:02:59.248 +02:00 [DBG] Loaded hosting startup assembly PhotoLabeler
+2020-06-29 17:02:59.278 +02:00 [INF] Application started. Press Ctrl+C to shut down.
+2020-06-29 17:02:59.302 +02:00 [INF] Hosting environment: Development
+2020-06-29 17:02:59.326 +02:00 [INF] Content root path: C:\proyectos\photo-labeler\src\PhotoLabeler
+2020-06-29 17:02:59.356 +02:00 [DBG] Hosting started
+2020-06-29 17:02:59.526 +02:00 [DBG] Connection id "0HM0S7M1LKGC5" received FIN.
+2020-06-29 17:02:59.536 +02:00 [DBG] Connection id "0HM0S7M1LKGC5" accepted.
+2020-06-29 17:02:59.573 +02:00 [DBG] Connection id "0HM0S7M1LKGC5" started.
+2020-06-29 17:02:59.625 +02:00 [DBG] Connection id "0HM0S7M1LKGC5" sending FIN because: "The client closed the connection."
+2020-06-29 17:02:59.662 +02:00 [DBG] Connection id "0HM0S7M1LKGC5" disconnecting.
+2020-06-29 17:02:59.696 +02:00 [DBG] Connection id "0HM0S7M1LKGC5" stopped.
+2020-06-29 17:03:01.811 +02:00 [DBG] Connection id "0HM0S7M1LKGC6" accepted.
+2020-06-29 17:03:01.886 +02:00 [DBG] Connection id "0HM0S7M1LKGC6" started.
+2020-06-29 17:03:01.887 +02:00 [DBG] Connection id "0HM0S7M1LKGC7" accepted.
+2020-06-29 17:03:02.000 +02:00 [DBG] Connection id "0HM0S7M1LKGC7" started.
+2020-06-29 17:03:02.474 +02:00 [INF] Request starting HTTP/1.1 GET http://localhost:5000/  
+2020-06-29 17:03:02.532 +02:00 [DBG] Wildcard detected, all requests with hosts will be allowed.
+2020-06-29 17:03:02.585 +02:00 [DBG] The request path / does not match a supported file type
+2020-06-29 17:03:02.655 +02:00 [DBG] Initializing Razor view compiler with compiled view: '/Pages/_Host.cshtml'.
+2020-06-29 17:03:02.763 +02:00 [DBG] 2 candidate(s) found for the request path '/'
+2020-06-29 17:03:02.806 +02:00 [DBG] Endpoint 'Page: /_Host' with route pattern '' is valid for the request path '/'
+2020-06-29 17:03:02.838 +02:00 [DBG] Endpoint 'Fallback {*path:nonfile}' with route pattern '{*path:nonfile}' is valid for the request path '/'
+2020-06-29 17:03:02.942 +02:00 [DBG] Request matched endpoint '/_Host'
+2020-06-29 17:03:02.964 +02:00 [INF] Executing endpoint '/_Host'
+2020-06-29 17:03:03.019 +02:00 [DBG] Registered model binder providers, in the following order: ["Microsoft.AspNetCore.Mvc.ModelBinding.Binders.BinderTypeModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.ServicesModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.BodyModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.HeaderModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.FloatingPointTypeModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.EnumTypeModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.SimpleTypeModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.CancellationTokenModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.ByteArrayModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.FormFileModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.FormCollectionModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.KeyValuePairModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.DictionaryModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.ArrayModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.CollectionModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.ComplexTypeModelBinderProvider"]
+2020-06-29 17:03:03.467 +02:00 [INF] Route matched with {page = "/_Host", action = "", controller = ""}. Executing page /_Host
+2020-06-29 17:03:03.496 +02:00 [DBG] Execution plan of authorization filters (in the following order): ["Microsoft.AspNetCore.Mvc.ViewFeatures.Filters.AutoValidateAntiforgeryTokenAuthorizationFilter"]
+2020-06-29 17:03:03.704 +02:00 [DBG] Execution plan of resource filters (in the following order): ["Microsoft.AspNetCore.Mvc.ViewFeatures.Filters.SaveTempDataFilter"]
+2020-06-29 17:03:03.767 +02:00 [DBG] Execution plan of action filters (in the following order): ["Microsoft.AspNetCore.Mvc.ModelBinding.UnsupportedContentTypeFilter (Order: -3000)"]
+2020-06-29 17:03:03.873 +02:00 [DBG] Execution plan of exception filters (in the following order): ["None"]
+2020-06-29 17:03:03.911 +02:00 [DBG] Execution plan of result filters (in the following order): ["Microsoft.AspNetCore.Mvc.ViewFeatures.Filters.SaveTempDataFilter"]
+2020-06-29 17:03:03.993 +02:00 [DBG] Executing page factory for page PhotoLabeler.Pages.Pages__Host (PhotoLabeler.Views)
+2020-06-29 17:03:04.057 +02:00 [DBG] Executed page factory for page PhotoLabeler.Pages.Pages__Host (PhotoLabeler.Views)
+2020-06-29 17:03:04.102 +02:00 [INF] Executing an implicit handler method - ModelState is "Valid"
+2020-06-29 17:03:04.120 +02:00 [INF] Executed an implicit handler method, returned result Microsoft.AspNetCore.Mvc.RazorPages.PageResult.
+2020-06-29 17:03:04.428 +02:00 [DBG] Initializing root component 0 (PhotoLabeler.App)
+2020-06-29 17:03:04.525 +02:00 [DBG] Rendering component 0 of type PhotoLabeler.App
+2020-06-29 17:03:04.581 +02:00 [DBG] Initializing component 1 (Microsoft.AspNetCore.Components.Routing.Router) as child of PhotoLabeler.App (PhotoLabeler.App)
+2020-06-29 17:03:04.660 +02:00 [DBG] Navigating to component PhotoLabeler.Pages.Index in response to path '' with base URI 'http://localhost:5000/'
+2020-06-29 17:03:04.709 +02:00 [DBG] Rendering component 1 of type Microsoft.AspNetCore.Components.Routing.Router
+2020-06-29 17:03:04.752 +02:00 [DBG] Initializing component 2 (Microsoft.AspNetCore.Components.RouteView) as child of Microsoft.AspNetCore.Components.Routing.Router (Microsoft.AspNetCore.Components.Routing.Router)
+2020-06-29 17:03:04.835 +02:00 [DBG] Rendering component 2 of type Microsoft.AspNetCore.Components.RouteView
+2020-06-29 17:03:04.867 +02:00 [DBG] Initializing component 3 (Microsoft.AspNetCore.Components.LayoutView) as child of Microsoft.AspNetCore.Components.RouteView (Microsoft.AspNetCore.Components.RouteView)
+2020-06-29 17:03:04.926 +02:00 [DBG] Rendering component 3 of type Microsoft.AspNetCore.Components.LayoutView
+2020-06-29 17:03:04.972 +02:00 [DBG] Initializing component 4 (PhotoLabeler.Shared.MainLayout) as child of Microsoft.AspNetCore.Components.LayoutView (Microsoft.AspNetCore.Components.LayoutView)
+2020-06-29 17:03:05.049 +02:00 [DBG] Rendering component 4 of type PhotoLabeler.Shared.MainLayout
+2020-06-29 17:03:06.227 +02:00 [DBG] Initializing component 5 (PhotoLabeler.Pages.Index) as child of PhotoLabeler.Shared.MainLayout (PhotoLabeler.Shared.MainLayout)
+2020-06-29 17:03:06.299 +02:00 [DBG] Rendering component 5 of type PhotoLabeler.Pages.Index
+2020-06-29 17:03:06.454 +02:00 [DBG] ResourceManagerStringLocalizer searched for 'Open folder' in 'PhotoLabeler.Resources.Pages.Index' with culture 'en'.
+2020-06-29 17:03:06.512 +02:00 [DBG] ResourceManagerStringLocalizer searched for 'Exit' in 'PhotoLabeler.Resources.Pages.Index' with culture 'en'.
+2020-06-29 17:03:06.590 +02:00 [DBG] Disposing component 0 of type PhotoLabeler.App
+2020-06-29 17:03:06.613 +02:00 [DBG] Disposing component 1 of type Microsoft.AspNetCore.Components.Routing.Router
+2020-06-29 17:03:06.644 +02:00 [DBG] Disposing component 2 of type Microsoft.AspNetCore.Components.RouteView
+2020-06-29 17:03:06.684 +02:00 [DBG] Disposing component 3 of type Microsoft.AspNetCore.Components.LayoutView
+2020-06-29 17:03:06.718 +02:00 [DBG] Disposing component 4 of type PhotoLabeler.Shared.MainLayout
+2020-06-29 17:03:06.751 +02:00 [DBG] Disposing component 5 of type PhotoLabeler.Pages.Index
+2020-06-29 17:03:06.828 +02:00 [INF] Executed page /_Host in 2842.7581ms
+2020-06-29 17:03:06.863 +02:00 [INF] Executed endpoint '/_Host'
+2020-06-29 17:03:06.899 +02:00 [DBG] Connection id "0HM0S7M1LKGC6" completed keep alive response.
+2020-06-29 17:03:06.932 +02:00 [INF] Request finished in 4470.482ms 200 text/html; charset=utf-8
+2020-06-29 17:03:07.074 +02:00 [DBG] Connection id "0HM0S7M1LKGC8" accepted.
+2020-06-29 17:03:07.075 +02:00 [INF] Request starting HTTP/1.1 GET http://localhost:5000/css/site.css  
+2020-06-29 17:03:07.191 +02:00 [INF] Request starting HTTP/1.1 GET http://localhost:5000/css/bootstrap/bootstrap.min.css  
+2020-06-29 17:03:07.253 +02:00 [DBG] Connection id "0HM0S7M1LKGC9" accepted.
+2020-06-29 17:03:07.307 +02:00 [INF] Sending file. Request path: '/css/site.css'. Physical path: 'C:\proyectos\photo-labeler\src\PhotoLabeler\wwwroot\css\site.css'
+2020-06-29 17:03:07.454 +02:00 [DBG] Connection id "0HM0S7M1LKGCA" accepted.
+2020-06-29 17:03:07.458 +02:00 [INF] Sending file. Request path: '/css/bootstrap/bootstrap.min.css'. Physical path: 'C:\proyectos\photo-labeler\src\PhotoLabeler\wwwroot\css\bootstrap\bootstrap.min.css'
+2020-06-29 17:03:07.506 +02:00 [DBG] Connection id "0HM0S7M1LKGC7" completed keep alive response.
+2020-06-29 17:03:07.537 +02:00 [DBG] Connection id "0HM0S7M1LKGCA" started.
+2020-06-29 17:03:07.630 +02:00 [DBG] Connection id "0HM0S7M1LKGC6" completed keep alive response.
+2020-06-29 17:03:07.669 +02:00 [INF] Request finished in 593.6351ms 200 text/css
+2020-06-29 17:03:07.699 +02:00 [INF] Request starting HTTP/1.1 GET http://localhost:5000/js/functions.js  
+2020-06-29 17:03:07.736 +02:00 [INF] Request finished in 545.7027ms 200 text/css
+2020-06-29 17:03:07.538 +02:00 [DBG] Connection id "0HM0S7M1LKGCB" accepted.
+2020-06-29 17:03:07.453 +02:00 [DBG] Connection id "0HM0S7M1LKGC9" started.
+2020-06-29 17:03:07.833 +02:00 [INF] Sending file. Request path: '/js/functions.js'. Physical path: 'C:\proyectos\photo-labeler\src\PhotoLabeler\wwwroot\js\functions.js'
+2020-06-29 17:03:07.864 +02:00 [DBG] Connection id "0HM0S7M1LKGCB" started.
+2020-06-29 17:03:07.833 +02:00 [INF] Request starting HTTP/1.1 GET http://localhost:5000/css/open-iconic/font/css/open-iconic-bootstrap.min.css  
+2020-06-29 17:03:07.967 +02:00 [DBG] Connection id "0HM0S7M1LKGCA" completed keep alive response.
+2020-06-29 17:03:08.005 +02:00 [INF] Request starting HTTP/1.1 GET http://localhost:5000/_content/PhotoLabeler.Components/js/JsInteropFunctions.js  
+2020-06-29 17:03:08.070 +02:00 [INF] Sending file. Request path: '/css/open-iconic/font/css/open-iconic-bootstrap.min.css'. Physical path: 'C:\proyectos\photo-labeler\src\PhotoLabeler\wwwroot\css\open-iconic\font\css\open-iconic-bootstrap.min.css'
+2020-06-29 17:03:08.090 +02:00 [INF] Request finished in 390.7541ms 200 application/javascript
+2020-06-29 17:03:08.188 +02:00 [INF] Sending file. Request path: '/_content/PhotoLabeler.Components/js/JsInteropFunctions.js'. Physical path: 'C:\proyectos\photo-labeler\src\PhotoLabeler.Components\wwwroot\js\JsInteropFunctions.js'
+2020-06-29 17:03:08.219 +02:00 [DBG] Connection id "0HM0S7M1LKGC6" completed keep alive response.
+2020-06-29 17:03:07.908 +02:00 [INF] Request starting HTTP/1.1 GET http://localhost:5000/_content/PhotoLabeler.Components/js/jquery-3.4.1.js  
+2020-06-29 17:03:08.290 +02:00 [DBG] Connection id "0HM0S7M1LKGCB" completed keep alive response.
+2020-06-29 17:03:08.326 +02:00 [INF] Request finished in 492.3613ms 200 text/css
+2020-06-29 17:03:07.225 +02:00 [DBG] Connection id "0HM0S7M1LKGC8" started.
+2020-06-29 17:03:08.397 +02:00 [INF] Request finished in 393.2373ms 200 application/javascript
+2020-06-29 17:03:08.458 +02:00 [INF] Request starting HTTP/1.1 GET http://localhost:5000/_framework/blazor.server.js  
+2020-06-29 17:03:08.533 +02:00 [INF] Sending file. Request path: '/_content/PhotoLabeler.Components/js/jquery-3.4.1.js'. Physical path: 'C:\proyectos\photo-labeler\src\PhotoLabeler.Components\wwwroot\js\jquery-3.4.1.js'
+2020-06-29 17:03:08.537 +02:00 [INF] Sending file. Request path: '/_framework/blazor.server.js'. Physical path: 'N/A'
+2020-06-29 17:03:08.572 +02:00 [DBG] Connection id "0HM0S7M1LKGC9" completed keep alive response.
+2020-06-29 17:03:08.605 +02:00 [DBG] Connection id "0HM0S7M1LKGC8" completed keep alive response.
+2020-06-29 17:03:08.631 +02:00 [INF] Request finished in 724.2458ms 200 application/javascript
+2020-06-29 17:03:08.671 +02:00 [INF] Request finished in 213.2634ms 200 application/javascript
+2020-06-29 17:03:08.724 +02:00 [INF] Request starting HTTP/1.1 POST http://localhost:5000/_blazor/negotiate?negotiateVersion=1 text/plain;charset=UTF-8 0
+2020-06-29 17:03:08.770 +02:00 [DBG] POST requests are not supported
+2020-06-29 17:03:08.814 +02:00 [DBG] 2 candidate(s) found for the request path '/_blazor/negotiate'
+2020-06-29 17:03:08.850 +02:00 [DBG] Endpoint '/_blazor/negotiate' with route pattern '/_blazor/negotiate' is valid for the request path '/_blazor/negotiate'
+2020-06-29 17:03:08.906 +02:00 [DBG] Endpoint 'Fallback {*path:nonfile}' with route pattern '{*path:nonfile}' is valid for the request path '/_blazor/negotiate'
+2020-06-29 17:03:08.935 +02:00 [INF] Request starting HTTP/1.1 GET http://localhost:5000/favicon.ico  
+2020-06-29 17:03:08.968 +02:00 [DBG] Request matched endpoint '/_blazor/negotiate'
+2020-06-29 17:03:09.013 +02:00 [INF] Sending file. Request path: '/favicon.ico'. Physical path: 'C:\proyectos\photo-labeler\src\PhotoLabeler\wwwroot\favicon.ico'
+2020-06-29 17:03:09.031 +02:00 [INF] Executing endpoint '/_blazor/negotiate'
+2020-06-29 17:03:09.097 +02:00 [DBG] Connection id "0HM0S7M1LKGC9" completed keep alive response.
+2020-06-29 17:03:09.135 +02:00 [DBG] New connection gUm9zwuKt8uUSCoyk3dCVQ created.
+2020-06-29 17:03:09.161 +02:00 [INF] Request finished in 226.7634ms 200 image/x-icon
+2020-06-29 17:03:09.207 +02:00 [DBG] Sending negotiation response.
+2020-06-29 17:03:09.252 +02:00 [INF] Executed endpoint '/_blazor/negotiate'
+2020-06-29 17:03:09.291 +02:00 [DBG] Connection id "0HM0S7M1LKGC8" completed keep alive response.
+2020-06-29 17:03:09.330 +02:00 [INF] Request finished in 605.7454ms 200 application/json
+2020-06-29 17:03:09.388 +02:00 [DBG] Connection id "0HM0S7M1LKGCC" accepted.
+2020-06-29 17:03:09.410 +02:00 [DBG] Connection id "0HM0S7M1LKGCC" started.
+2020-06-29 17:03:09.444 +02:00 [INF] Request starting HTTP/1.1 GET http://localhost:5000/_blazor?id=Qw6oLA8NDCCPcUW7PESEPg  
+2020-06-29 17:03:09.476 +02:00 [DBG] The request path /_blazor does not match a supported file type
+2020-06-29 17:03:09.520 +02:00 [DBG] 2 candidate(s) found for the request path '/_blazor'
+2020-06-29 17:03:09.547 +02:00 [DBG] Endpoint '/_blazor' with route pattern '/_blazor' is valid for the request path '/_blazor'
+2020-06-29 17:03:09.585 +02:00 [DBG] Endpoint 'Fallback {*path:nonfile}' with route pattern '{*path:nonfile}' is valid for the request path '/_blazor'
+2020-06-29 17:03:09.644 +02:00 [DBG] Request matched endpoint '/_blazor'
+2020-06-29 17:03:09.674 +02:00 [INF] Executing endpoint '/_blazor'
+2020-06-29 17:03:09.721 +02:00 [DBG] Establishing new connection.
+2020-06-29 17:03:09.745 +02:00 [DBG] OnConnectedAsync started.
+2020-06-29 17:03:09.753 +02:00 [DBG] Socket opened using Sub-Protocol: 'null'.
+2020-06-29 17:03:09.818 +02:00 [DBG] Found protocol implementation for requested protocol: blazorpack.
+2020-06-29 17:03:09.845 +02:00 [DBG] Completed connection handshake. Using HubProtocol 'blazorpack'.
+2020-06-29 17:03:09.920 +02:00 [DBG] Received hub invocation: InvocationMessage { InvocationId: "0", Target: "StartCircuit", Arguments: [ http://localhost:5000/, http://localhost:5000/, [{"type":"server","sequence":0,"descriptor":"CfDJ8FnU7LtxdkhKh8bIrsYq2gYkcRA9uYfA5zrkLcdgqPlxtTjKUdpSDe9pBG8VgpMtrbrdwuy01CO5Zpf7tEHelAY8LfV2NnHRmp9lP0+bQ5tfdoZ90TSIfKsZHX9YYfcPxc1cH4hC06H6kc5pjjswW5wgg+L3KbonjVntcGCqEyXBM21i8ew2dEpudzgm4boS7eTecig0R35R+gxSGR/6Fixb6MvNfXFBLpUkwvcnqnpDKo7LR1LRJC44EZcTSNLjx0nICgLJb8BObbBfOcI8U+UoylaXeHsr4a9GcBucbqJsK6QbLrdoOkqYEaqfmTWxdoXabTCxlxRUn2YYRWA6wPikcrMjGnei8MUeN6WMJi7f"}] ], StreamIds: [  ] }.
+2020-06-29 17:03:10.089 +02:00 [DBG] Created circuit Gi3pIW1F2uALYLXh9-WQLkTz5pyZ0JmhxmdvstFD5HE for connection gUm9zwuKt8uUSCoyk3dCVQ
+2020-06-29 17:03:10.119 +02:00 [DBG] Circuit initialization started.
+2020-06-29 17:03:10.165 +02:00 [DBG] Opening circuit with id 'Gi3pIW1F2uALYLXh9-WQLkTz5pyZ0JmhxmdvstFD5HE'.
+2020-06-29 17:03:10.195 +02:00 [DBG] Circuit id 'Gi3pIW1F2uALYLXh9-WQLkTz5pyZ0JmhxmdvstFD5HE' connected using connection 'gUm9zwuKt8uUSCoyk3dCVQ'.
+2020-06-29 17:03:10.238 +02:00 [DBG] Initializing root component 0 (PhotoLabeler.App)
+2020-06-29 17:03:10.283 +02:00 [DBG] Rendering component 0 of type PhotoLabeler.App
+2020-06-29 17:03:10.306 +02:00 [DBG] Initializing component 1 (Microsoft.AspNetCore.Components.Routing.Router) as child of PhotoLabeler.App (PhotoLabeler.App)
+2020-06-29 17:03:10.381 +02:00 [DBG] Navigating to component PhotoLabeler.Pages.Index in response to path '' with base URI 'http://localhost:5000/'
+2020-06-29 17:03:10.436 +02:00 [DBG] Rendering component 1 of type Microsoft.AspNetCore.Components.Routing.Router
+2020-06-29 17:03:10.465 +02:00 [DBG] Initializing component 2 (Microsoft.AspNetCore.Components.RouteView) as child of Microsoft.AspNetCore.Components.Routing.Router (Microsoft.AspNetCore.Components.Routing.Router)
+2020-06-29 17:03:10.531 +02:00 [DBG] Rendering component 2 of type Microsoft.AspNetCore.Components.RouteView
+2020-06-29 17:03:10.563 +02:00 [DBG] Initializing component 3 (Microsoft.AspNetCore.Components.LayoutView) as child of Microsoft.AspNetCore.Components.RouteView (Microsoft.AspNetCore.Components.RouteView)
+2020-06-29 17:03:10.646 +02:00 [DBG] Rendering component 3 of type Microsoft.AspNetCore.Components.LayoutView
+2020-06-29 17:03:10.696 +02:00 [DBG] Initializing component 4 (PhotoLabeler.Shared.MainLayout) as child of Microsoft.AspNetCore.Components.LayoutView (Microsoft.AspNetCore.Components.LayoutView)
+2020-06-29 17:03:10.760 +02:00 [DBG] Rendering component 4 of type PhotoLabeler.Shared.MainLayout
+2020-06-29 17:03:10.791 +02:00 [DBG] Initializing component 5 (PhotoLabeler.Pages.Index) as child of PhotoLabeler.Shared.MainLayout (PhotoLabeler.Shared.MainLayout)
+2020-06-29 17:03:10.866 +02:00 [DBG] Rendering component 5 of type PhotoLabeler.Pages.Index
+2020-06-29 17:03:10.891 +02:00 [DBG] ResourceManagerStringLocalizer searched for 'Open folder' in 'PhotoLabeler.Resources.Pages.Index' with culture 'en'.
+2020-06-29 17:03:10.953 +02:00 [DBG] ResourceManagerStringLocalizer searched for 'Exit' in 'PhotoLabeler.Resources.Pages.Index' with culture 'en'.
+2020-06-29 17:03:11.030 +02:00 [DBG] Sending render batch 2 of size 1573 bytes to client gUm9zwuKt8uUSCoyk3dCVQ.
+2020-06-29 17:03:11.059 +02:00 [DBG] Circuit initialization succeeded.
+2020-06-29 17:03:11.108 +02:00 [DBG] Created circuit 'Gi3pIW1F2uALYLXh9-WQLkTz5pyZ0JmhxmdvstFD5HE' with secret '(redacted)' for 'gUm9zwuKt8uUSCoyk3dCVQ'
+2020-06-29 17:03:11.168 +02:00 [DBG] Received hub invocation: InvocationMessage { InvocationId: "", Target: "OnRenderCompleted", Arguments: [ 2,  ], StreamIds: [  ] }.
+2020-06-29 17:03:11.224 +02:00 [DBG] Received confirmation for batch 2
+2020-06-29 17:03:11.257 +02:00 [DBG] Completing batch 2 without error in 235.4392ms.
+2020-06-29 17:03:11.313 +02:00 [DBG] Begin invoke JS interop '2': 'interopFunctions.focusInHeader'
+2020-06-29 17:03:11.338 +02:00 [DBG] Received hub invocation: InvocationMessage { InvocationId: "", Target: "EndInvokeJSFromDotNet", Arguments: [ 2, True, [2,true,null] ], StreamIds: [  ] }.
+2020-06-29 17:03:11.353 +02:00 [DBG] Begin invoke JS interop '3': 'Blazor._internal.navigationManager.enableNavigationInterception'
+2020-06-29 17:03:11.442 +02:00 [DBG] Begin invoke JS interop '4': 'interopFunctions.focusByQuerySelector'
+2020-06-29 17:03:11.443 +02:00 [DBG] Received hub invocation: InvocationMessage { InvocationId: "", Target: "EndInvokeJSFromDotNet", Arguments: [ 3, True, [3,true,null] ], StreamIds: [  ] }.
+2020-06-29 17:03:11.475 +02:00 [DBG] The JS interop call with callback id '2' succeeded.
+2020-06-29 17:03:11.529 +02:00 [DBG] Received hub invocation: InvocationMessage { InvocationId: "", Target: "EndInvokeJSFromDotNet", Arguments: [ 4, True, [4,true,null] ], StreamIds: [  ] }.
+2020-06-29 17:03:11.568 +02:00 [DBG] The JS interop call with callback id '3' succeeded.
+2020-06-29 17:03:11.640 +02:00 [DBG] The JS interop call with callback id '4' succeeded.
+2020-06-29 17:04:16.909 +02:00 [DBG] Received hub invocation: InvocationMessage { InvocationId: "", Target: "DispatchBrowserEvent", Arguments: [ {"browserRendererId":0,"eventHandlerId":2,"eventArgsType":"mouse","eventFieldInfo":null}, {"type":"click","detail":0,"screenX":0,"screenY":0,"clientX":0,"clientY":0,"button":0,"buttons":0,"ctrlKey":false,"shiftKey":false,"altKey":false,"metaKey":false} ], StreamIds: [  ] }.
+2020-06-29 17:04:17.002 +02:00 [DBG] Handling event {"Id":5,"Name":"HandlingEvent"} of type 'MouseEventArgs'
+2020-06-29 17:04:17.046 +02:00 [DBG] Rendering component 5 of type PhotoLabeler.Pages.Index
+2020-06-29 17:04:17.072 +02:00 [DBG] ResourceManagerStringLocalizer searched for 'Open folder' in 'PhotoLabeler.Resources.Pages.Index' with culture 'en'.
+2020-06-29 17:04:17.118 +02:00 [DBG] ResourceManagerStringLocalizer searched for 'Exit' in 'PhotoLabeler.Resources.Pages.Index' with culture 'en'.
+2020-06-29 17:04:17.164 +02:00 [DBG] Sending render batch 3 of size 48 bytes to client gUm9zwuKt8uUSCoyk3dCVQ.
+2020-06-29 17:04:17.203 +02:00 [DBG] Received hub invocation: InvocationMessage { InvocationId: "", Target: "OnRenderCompleted", Arguments: [ 3,  ], StreamIds: [  ] }.
+2020-06-29 17:04:17.250 +02:00 [DBG] Received confirmation for batch 3
+2020-06-29 17:04:17.276 +02:00 [DBG] Completing batch 3 without error in 111.4325ms.
