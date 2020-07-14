@@ -12,7 +12,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\metadata-extractor\MetadataExtractor\MetadataExtractor.csproj" />
     <ProjectReference Include="..\PhotoLabeler.Entities\PhotoLabeler.Entities.csproj" />
-    <ProjectReference Include="..\PhotoLabeler.PhotoStorageReader\PhotoLabeler.PhtotoStorageReader.csproj" />
+    <ProjectReference Include="..\PhotoLabeler.PhotoStorageReader\PhotoLabeler.PhotoStorageReader.csproj" />
   </ItemGroup>
 
 </Project>

@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 using ElectronNET.API;
 using ElectronNET.API.Entities;
@@ -70,7 +71,7 @@ namespace PhotoLabeler.Services
 					languageMenuItems.Add(languageItem);
 				}
 
-				var menuItems = new MenuItem[]
+				var menuItems = new List<MenuItem>()
 				{
 					new MenuItem
 					{
@@ -99,7 +100,24 @@ namespace PhotoLabeler.Services
 						Submenu = languageMenuItems.ToArray()
 					}
 				};
-				Electron.Menu.SetApplicationMenu(menuItems);
+#if DEBUG
+				menuItems.Add(new MenuItem
+				{
+					Label = _localizer["Debug"],
+					Type = MenuType.submenu,
+					Submenu = new[]
+					{
+						new MenuItem
+						{
+							Label = _localizer["Developer tools..."],
+							Accelerator = "f12",
+							Click = () => { Electron.WindowManager.BrowserWindows.First().WebContents.OpenDevTools(); }
+						},
+					}
+				});
+#endif
+
+				Electron.Menu.SetApplicationMenu(menuItems.ToArray());
 			}
 		}
 
