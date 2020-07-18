@@ -1,11 +1,3 @@
-using System;
-using System.IO;
-using System.Linq;
-using PhotoLabeler.PhotoStorageReader.Interfaces;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats.Jpeg;
-using SixLabors.ImageSharp.Processing;
-
 namespace PhotoLabeler.PhotoStorageReader.Implementations
 {
     // Nothing relevant in this file, only 100x100 pixels for non images or non suported images.
