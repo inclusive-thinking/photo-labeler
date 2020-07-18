@@ -92,6 +92,7 @@ namespace PhotoLabeler.Entities
 				Row = row;
 				Grid = grid;
 			}
+			public string SrcBase64 {get; set;}
 		}
 
 		public class GridRow

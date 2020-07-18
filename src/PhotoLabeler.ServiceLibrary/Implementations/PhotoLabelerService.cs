@@ -189,7 +189,8 @@ namespace PhotoLabeler.ServiceLibrary.Implementations
 
 				var pictCell = new Grid.GridCellPict(cellIndex: row.Cells.Count, row: row, grid: grid)
 				{
-					Text = img
+					Text = Path.GetFileName(photo.Path),
+					SrcBase64 = img,
 				};
 				row.Cells.Add(pictCell);
 

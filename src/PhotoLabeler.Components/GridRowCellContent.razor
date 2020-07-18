@@ -10,13 +10,14 @@
         @Cell.Text
     </a>
 }
-else if (Cell is PhotoLabeler.Entities.Grid.GridCellPict) 
+else if (Cell is PhotoLabeler.Entities.Grid.GridCellPict CellPict) 
 {
     if (!String.IsNullOrEmpty(Cell.Text)) 
     {        
         <img @onkeydown="@( (KeyboardEventArgs e) => Item_KeyDown(e) )" 
             tabindex="@( Cell.Selected?"0":"-1")"
-            src="@Cell.Text"
+            src="@CellPict.SrcBase64"
+            alt="@Cell.Text"
             style="width: 100px; heigh: 100px;"
         />
     }
