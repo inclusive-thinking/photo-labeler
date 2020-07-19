@@ -27,17 +27,20 @@ namespace PhotoLabeler.Pages
 		{			
 			menuService.MnuFileOpenFolderClick += SelectDirectory;
 
-			menuService.MnuLanguagesItemClick += async (e) =>
-			{
-				await appConfigRepository.SetEntryAsync(PhotoLabeler.Constants.ConfigConstants.LanguageConfigKey, e.CultureName);
-				navigationManager.NavigateTo($"/Language/?cultureName={HttpUtility.UrlEncode(e.CultureName)}&redirectUri=%2F", true);
-			};
+			menuService.MnuLanguagesItemClick += SelectLanguage;
+			
 			menuService.CreateMenus();
 			QuerySelectorToFocusAfterRendering = "button";
 			await base.OnInitializedAsync();
 		}
 
-		private async Task SelectDirectory()
+        private async Task SelectLanguage(LanguageEventArgs e)
+        {
+			await appConfigRepository.SetEntryAsync(PhotoLabeler.Constants.ConfigConstants.LanguageConfigKey, e.CultureName);
+			navigationManager.NavigateTo($"/Language/?cultureName={HttpUtility.UrlEncode(e.CultureName)}&redirectUri=%2F", true);
+        }
+
+        private async Task SelectDirectory()
 		{
 			
 			try
@@ -187,6 +190,7 @@ namespace PhotoLabeler.Pages
 			if (disposing)
 			{
 				menuService.MnuFileOpenFolderClick -= SelectDirectory;
+				menuService.MnuLanguagesItemClick -= SelectLanguage;
 				base.Dispose();
 			}
 
