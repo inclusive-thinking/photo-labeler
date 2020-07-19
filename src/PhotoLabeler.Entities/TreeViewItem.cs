@@ -14,7 +14,7 @@ namespace PhotoLabeler.Entities
 		public TreeViewItem<T> Parent { get; set; }
 
 		public bool ItemsLoaded { get; set; }
-		
+
 		public string Path { get; set; }
 
 		public string Name { get; set; }
@@ -24,7 +24,7 @@ namespace PhotoLabeler.Entities
 		public bool Selected { get; set; }
 
 		public int Level { get; set; }
-		
+
 		public int ItemIndex { get; set; }
 		public TreeView<T> TreeView { get; set; }
 

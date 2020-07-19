@@ -11,9 +11,9 @@ using MetadataExtractor;
 using MetadataExtractor.Formats.Xmp;
 using Microsoft.Extensions.Localization;
 using PhotoLabeler.Entities;
+using PhotoLabeler.PhotoStorageReader.Interfaces;
 using PhotoLabeler.ServiceLibrary.Exceptions;
 using PhotoLabeler.ServiceLibrary.Interfaces;
-
 namespace PhotoLabeler.ServiceLibrary.Implementations
 {
 	public class PhotoLabelerService : IPhotoLabelerService
@@ -26,14 +26,19 @@ namespace PhotoLabeler.ServiceLibrary.Implementations
 		private const int MaxFileNameLength = 260;
 
 		private readonly IStringLocalizer<PhotoLabelerService> _localizer;
+		private readonly IPhotoReader _photoReader;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="PhotoLabelerService"/> class.
 		/// </summary>
 		/// <param name="localizer">The localizer.</param>
-		public PhotoLabelerService(IStringLocalizer<PhotoLabelerService> localizer)
+		public PhotoLabelerService(
+			IStringLocalizer<PhotoLabelerService> localizer,
+			IPhotoReader photoReader
+			)
 		{
 			_localizer = localizer;
+			_photoReader = photoReader;
 		}
 
 
@@ -133,6 +138,7 @@ namespace PhotoLabeler.ServiceLibrary.Implementations
 			}
 		}
 
+
 		/// <summary>
 		/// Gets the grid from TreeView item asynchronous.
 		/// </summary>
@@ -149,26 +155,67 @@ namespace PhotoLabeler.ServiceLibrary.Implementations
 				Caption = _localizer["List of photos in the current directory."]
 			};
 
-			var headerRow = new Grid.GridRow();
-			headerRow.Cells.Add(new Grid.GridHeaderCell { Text = _localizer["Label"], CellIndex = headerRow.Cells.Count, Row = headerRow, Grid = grid });
-			headerRow.Cells.Add(new Grid.GridHeaderCell { Text = _localizer["Filename"], CellIndex = headerRow.Cells.Count, Row = headerRow, Grid = grid });
-			headerRow.Cells.Add(new Grid.GridHeaderCell { Text = _localizer["Creation date"], CellIndex = headerRow.Cells.Count, Row = headerRow, Grid = grid });
-			headerRow.Grid = grid;
+			var headerRow = new Grid.GridRow(0, grid);
+			headerRow.Cells.Add(new Grid.GridHeaderCell(cellIndex: headerRow.Cells.Count, row: headerRow, grid: grid)
+			{
+				Text = _localizer["Picture"]
+			});
+			headerRow.Cells.Add(new Grid.GridHeaderCell(cellIndex: headerRow.Cells.Count, row: headerRow, grid: grid)
+			{
+				Text = _localizer["Label"]
+			});
+			headerRow.Cells.Add(new Grid.GridHeaderCell(cellIndex: headerRow.Cells.Count, row: headerRow, grid: grid)
+			{
+				Text = _localizer["Filename"]
+			});
+			headerRow.Cells.Add(new Grid.GridHeaderCell(cellIndex: headerRow.Cells.Count, row: headerRow, grid: grid)
+			{
+				Text = _localizer["Creation date"]
+			});
+
+			//
 			grid.Header = new Grid.GridHeader { Row = headerRow };
 			grid.Body = new Grid.GridBody();
 
 			foreach (var photo in item.Items)
 			{
-				var row = new Grid.GridRow();
-				var labelCell = new Grid.GridCell { Text = photo.Label ?? _localizer["Unlabeled"], CellIndex = row.Cells.Count, Row = row, Grid = grid };
+				var row = new Grid.GridRow(rowIndex: grid.Body.Rows.Count, grid);
+
+				//
+				var img = _photoReader.GetImgSrc(photo.Path);
+
+				var pictCell = new Grid.GridCellPict(cellIndex: row.Cells.Count, row: row, grid: grid)
+				{
+					Text = photo.Label,
+					Src = photo.Path,
+					SrcBase64 = img,
+				};
+				row.Cells.Add(pictCell);
+
+				//
+				var labelCell = new Grid.GridCellLabel(cellIndex: row.Cells.Count, row: row, grid: grid)
+				{
+					Text = photo.Label ?? _localizer["Unlabeled"]
+				};
 				row.Cells.Add(labelCell);
-				var nameCell = new Grid.GridCell { Text = Path.GetFileName(photo.Path), CellIndex = row.Cells.Count, Row = row, Grid = grid };
+
+				//
+				var nameCell = new Grid.GridCellFileName(cellIndex: row.Cells.Count, row: row, grid: grid)
+				{
+					Text = Path.GetFileName(photo.Path)
+				};
 				row.Cells.Add(nameCell);
-				var dateTakenCell = new Grid.GridCell { Text = (photo.TakenDate.HasValue ? photo.TakenDate.Value.ToString("F") : _localizer["unknown"]), CellIndex = row.Cells.Count, Row = row, Grid = grid };
+
+				//
+				var dateTakenCell = new Grid.GridCellTakenData(cellIndex: row.Cells.Count, row: row, grid: grid)
+				{
+					Text = photo.TakenDate?.ToString("F") ?? _localizer["unknown"]
+				};
 				row.Cells.Add(dateTakenCell);
-				row.RowIndex = grid.Body.Rows.Count;
-				row.Grid = grid;
+
+				//
 				grid.Body.Rows.Add(row);
+
 			}
 			if (grid.Body.Rows.Any())
 			{

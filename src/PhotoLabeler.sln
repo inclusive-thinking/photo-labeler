@@ -17,6 +17,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhotoLabeler.Data", "PhotoL
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MetadataExtractor", "..\metadata-extractor\MetadataExtractor\MetadataExtractor.csproj", "{7A96C04A-3766-4487-B1B5-CE09DB93A290}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhotoLabeler.PhotoStorageReader", "PhotoLabeler.PhotoStorageReader\PhotoLabeler.PhotoStorageReader.csproj", "{65AA5036-A191-49BA-83F4-B45B6CF1217B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{7A96C04A-3766-4487-B1B5-CE09DB93A290}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7A96C04A-3766-4487-B1B5-CE09DB93A290}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7A96C04A-3766-4487-B1B5-CE09DB93A290}.Release|Any CPU.Build.0 = Release|Any CPU
+		{65AA5036-A191-49BA-83F4-B45B6CF1217B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{65AA5036-A191-49BA-83F4-B45B6CF1217B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{65AA5036-A191-49BA-83F4-B45B6CF1217B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{65AA5036-A191-49BA-83F4-B45B6CF1217B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -3,6 +3,7 @@
 using System.Data;
 using System.Threading.Tasks;
 using ElectronNET.API;
+using ElectronNET.API.Entities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Localization;
@@ -13,6 +14,8 @@ using Microsoft.Extensions.Hosting;
 using PhotoLabeler.Data.Interfaces.Repositories;
 using PhotoLabeler.Data.Repositories.Interfaces;
 using PhotoLabeler.Interfaces;
+using PhotoLabeler.PhotoStorageReader.Implementations;
+using PhotoLabeler.PhotoStorageReader.Interfaces;
 using PhotoLabeler.ServiceLibrary.Implementations;
 using PhotoLabeler.ServiceLibrary.Interfaces;
 using PhotoLabeler.Services;
@@ -53,6 +56,7 @@ namespace PhotoLabeler
 				options.ResourcesPath = "Resources";
 			});
 			services.AddSingleton<IPhotoLabelerService, PhotoLabelerService>();
+			services.AddSingleton<IPhotoReader, PhotoReaderBase64>();
 			services.AddSingleton<IMenuService, MenuService>();
 			services.AddSingleton<IDbConnection>((serviceProvider) =>
 			{
@@ -86,7 +90,19 @@ namespace PhotoLabeler
 				endpoints.MapFallbackToPage("/_Host");
 			});
 			Electron.App.CommandLine.AppendSwitch("disable -http-cache");
-			Task.Run(async () => await Electron.WindowManager.CreateWindowAsync($"http://localhost:{BridgeSettings.WebPort}/Language/SetCultureByConfig"));
+
+			//var browserWindowOptions = new BrowserWindowOptions
+			//{
+			//    WebPreferences = new WebPreferences
+			//    {
+			//        WebSecurity = false,
+			//    },
+			//};
+
+			Task.Run(async () => await Electron.WindowManager.CreateWindowAsync(
+				//browserWindowOptions,
+				$"http://localhost:{BridgeSettings.WebPort}/Language/SetCultureByConfig"
+			));
 		}
 	}
 }

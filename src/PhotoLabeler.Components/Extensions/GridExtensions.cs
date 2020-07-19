@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace PhotoLabeler.Components.Extensions
 {
@@ -32,7 +31,7 @@ namespace PhotoLabeler.Components.Extensions
 			{
 				newRow = allRows[(direction == RowMovement.Up ? newIndex-- : newIndex++)];
 			} while (!newRow.Visible && newIndex >= 0 && newIndex <= allRows.Count - 1);
-			
+
 			if (!newRow.Visible)
 			{
 				return null;
