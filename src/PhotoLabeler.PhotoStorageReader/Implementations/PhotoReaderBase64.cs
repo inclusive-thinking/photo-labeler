@@ -3,6 +3,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using PhotoLabeler.PhotoStorageReader.Interfaces;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
@@ -12,6 +13,13 @@ namespace PhotoLabeler.PhotoStorageReader.Implementations
 {
 	public class PhotoReaderBase64 : IPhotoReader
 	{
+		public async Task<string> GetImgSrcAsync(string path)
+		{
+			var result = await Task.FromResult( this.GetImgSrc(path) );
+			return result;
+		}
+
+		public string GetPictureImageSrc() => PhotoReaderBase64thumbnails.B64ImageThumbnail;
 		public string GetImgSrc(string path)
 		{
 			const int uiSize = 100;

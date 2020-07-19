@@ -138,6 +138,14 @@ namespace PhotoLabeler.ServiceLibrary.Implementations
 			}
 		}
 
+		public async Task RedrawPicture(Grid.GridCellPict cell)
+		{
+			var path = cell.Src;
+			if (string.IsNullOrEmpty(path)) return;
+			var img = await _photoReader.GetImgSrcAsync(path);			
+			cell.SrcBase64 = img;
+		}
+
 
 		/// <summary>
 		/// Gets the grid from TreeView item asynchronous.
@@ -181,15 +189,19 @@ namespace PhotoLabeler.ServiceLibrary.Implementations
 			{
 				var row = new Grid.GridRow(rowIndex: grid.Body.Rows.Count, grid);
 
+				row.PicturePath = photo.Path;
+				var path = row.PicturePath;
+
 				//
-				var img = _photoReader.GetImgSrc(photo.Path);
+				var img = _photoReader.GetPictureImageSrc();
 
 				var pictCell = new Grid.GridCellPict(cellIndex: row.Cells.Count, row: row, grid: grid)
 				{
 					Text = photo.Label,
-					Src = photo.Path,
-					SrcBase64 = img,
+					Src = path,
+					SrcBase64 = img,					
 				};
+				pictCell.ReloadImage = ()=>RedrawPicture(pictCell);
 				row.Cells.Add(pictCell);
 
 				//
@@ -202,7 +214,7 @@ namespace PhotoLabeler.ServiceLibrary.Implementations
 				//
 				var nameCell = new Grid.GridCellFileName(cellIndex: row.Cells.Count, row: row, grid: grid)
 				{
-					Text = Path.GetFileName(photo.Path)
+					Text = Path.GetFileName(path)
 				};
 				row.Cells.Add(nameCell);
 

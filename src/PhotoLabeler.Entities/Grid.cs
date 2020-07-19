@@ -1,7 +1,9 @@
 ﻿// Copyright (c) Juanjo Montiel and contributors. All Rights Reserved. Licensed under the GNU General Public License, Version 2.0. See LICENSE in the project root for license information.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace PhotoLabeler.Entities
 {
@@ -90,6 +92,7 @@ namespace PhotoLabeler.Entities
 			public string Src { get; set; }
 
 			public string SrcBase64 { get; set; }
+			public Func<Task> ReloadImage {get; set;} = null;
 		}
 
 		public class GridRow
@@ -99,6 +102,8 @@ namespace PhotoLabeler.Entities
 				RowIndex = rowIndex;
 				Grid = grid;
 			}
+
+			public string PicturePath {get; set; } = null;
 
 			public List<GridCell> Cells { get; set; } = new List<GridCell>();
 
