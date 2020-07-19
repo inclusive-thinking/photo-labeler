@@ -15,7 +15,7 @@ else if (Cell is PhotoLabeler.Entities.Grid.GridCellPict cellPict)
 		 tabindex="@( cellPict.Selected?"0":"-1")"
 		 src="@cellPict.SrcBase64"
 		 alt="@(String.IsNullOrWhiteSpace(cellPict.Text) ? cellPict.Src: cellPict.Text)"
-		 style="width: 100px; height: 100px;" />
+		 style="width: 100px; height: 100px; border-radius: 4px;" />
 }
 else
 {
