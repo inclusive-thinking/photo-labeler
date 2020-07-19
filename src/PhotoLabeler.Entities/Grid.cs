@@ -1,7 +1,7 @@
-﻿using System;
+﻿// Copyright (c) Juanjo Montiel and contributors. All Rights Reserved. Licensed under the GNU General Public License, Version 2.0. See LICENSE in the project root for license information.
+
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace PhotoLabeler.Entities
 {
@@ -17,10 +17,12 @@ namespace PhotoLabeler.Entities
 
 		public abstract class GridCell
 		{
-
-			public string Text { get; set; }
-
-			public string Link { get; set; }
+			protected GridCell(int cellIndex, GridRow row, Grid grid)
+			{
+				CellIndex = cellIndex;
+				Row = row;
+				Grid = grid;
+			}
 
 			public bool Selected { get; set; }
 
@@ -30,69 +32,64 @@ namespace PhotoLabeler.Entities
 
 			public Grid Grid { get; set; }
 
+			public string Text { get; set; }
 		}
 
 		public class GridHeaderCell : GridCell
 		{
 			public GridHeaderCell(int cellIndex, GridRow row, Grid grid)
+			 : base(cellIndex, row, grid)
 			{
-				CellIndex = cellIndex;
-				Row = row;
-				Grid = grid;
 			}
 
-			public Order Order { get; set; } = Order.Default;
+			public Order Order { get; set; }
+				= Order.Default;
 		}
 
 		public class GridCellLabel : GridCell
 		{
 			public GridCellLabel(int cellIndex, GridRow row, Grid grid)
+				: base(cellIndex, row, grid)
 			{
-				CellIndex = cellIndex;
-				Row = row;
-				Grid = grid;
 			}
 		}
 
 		public class GridCellLink : GridCell
 		{
 			public GridCellLink(int cellIndex, GridRow row, Grid grid)
+				: base(cellIndex, row, grid)
 			{
-				CellIndex = cellIndex;
-				Row = row;
-				Grid = grid;
 			}
+
+			public string Link { get; set; }
 		}
 
 		public class GridCellFileName : GridCell
 		{
 			public GridCellFileName(int cellIndex, GridRow row, Grid grid)
+				: base(cellIndex, row, grid)
 			{
-				CellIndex = cellIndex;
-				Row = row;
-				Grid = grid;
 			}
 		}
 
 		public class GridCellTakenData : GridCell
 		{
-			public GridCellTakenData(int cellIndex, GridRow row, Grid grid)
+			public GridCellTakenData(int cellIndex, GridRow row, Grid grid
+				) : base(cellIndex, row, grid)
 			{
-				CellIndex = cellIndex;
-				Row = row;
-				Grid = grid;
 			}
 		}
 
 		public class GridCellPict : GridCell
 		{
 			public GridCellPict(int cellIndex, GridRow row, Grid grid)
+				: base(cellIndex, row, grid)
 			{
-				CellIndex = cellIndex;
-				Row = row;
-				Grid = grid;
 			}
-			public string SrcBase64 {get; set;}
+
+			public string Src { get; set; }
+
+			public string SrcBase64 { get; set; }
 		}
 
 		public class GridRow
@@ -109,7 +106,6 @@ namespace PhotoLabeler.Entities
 
 			public bool Visible { get; set; } = true;
 
-
 			public Grid Grid { get; set; }
 
 
@@ -117,9 +113,7 @@ namespace PhotoLabeler.Entities
 
 		public class GridHeader
 		{
-
 			public GridRow Row { get; set; }
-
 		}
 
 		public class GridBody
@@ -137,19 +131,16 @@ namespace PhotoLabeler.Entities
 		{
 			get
 			{
-
 				var allRowsTmp =
-					this.Body?.Rows?.ToList() ??
+					Body?.Rows?.ToList() ??
 					new List<GridRow>();
 
-				if (this.Header?.Row != null)
+				if (Header?.Row != null)
 				{
-					allRowsTmp.Insert(0, this.Header.Row);
+					allRowsTmp.Insert(0, Header.Row);
 				}
-
 				return allRowsTmp;
 			}
 		}
-
 	}
 }

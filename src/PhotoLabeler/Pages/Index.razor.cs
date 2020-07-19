@@ -1,0 +1,179 @@
+﻿// Copyright (c) Juanjo Montiel and contributors. All Rights Reserved. Licensed under the GNU General Public License, Version 2.0. See LICENSE in the project root for license information.
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Web;
+using ElectronNET.API;
+using ElectronNET.API.Entities;
+using Microsoft.AspNetCore.Components;
+using PhotoLabeler.Components.Extensions;
+using PhotoLabeler.Entities;
+
+namespace PhotoLabeler.Pages
+{
+	public partial class Index
+	{
+		private string selectedFile;
+
+		private Entities.TreeView<Photo> treeViewItems;
+
+		private Entities.Grid gridData = null;
+
+		private string statusText = string.Empty;
+
+		protected override async Task OnInitializedAsync()
+		{
+			menuService.MnuFileOpenFolderClick += async () =>
+			{
+				await SelectDirectory();
+			};
+			menuService.MnuLanguagesItemClick += async (e) =>
+			{
+				await appConfigRepository.SetEntryAsync(PhotoLabeler.Constants.ConfigConstants.LanguageConfigKey, e.CultureName);
+				navigationManager.NavigateTo($"/Language/?cultureName={HttpUtility.UrlEncode(e.CultureName)}&redirectUri=%2F", true);
+			};
+			menuService.CreateMenus();
+			QuerySelectorToFocusAfterRendering = "button";
+			await base.OnInitializedAsync();
+		}
+
+		private async Task SelectDirectory()
+		{
+			try
+			{
+				var mainWindow = Electron.WindowManager.BrowserWindows.First();
+				var options = new OpenDialogOptions
+				{
+					Properties = new OpenDialogProperty[] {
+			OpenDialogProperty.openDirectory,
+		},
+					Title = localizer["Choose the directory which contains the photos"]
+				};
+				string[] files = await Electron.Dialog.ShowOpenDialogAsync(mainWindow, options);
+				if (files.Length > 0)
+				{
+					selectedFile = files[0];
+					statusText = localizer["Loading directories..."];
+					treeViewItems = await photoLabelerService.GetPhotosFromDirAsync(selectedFile);
+					statusText = localizer["Directories loaded"];
+					QuerySelectorToFocusAfterRendering = "#treeViewPhotos [tabindex=\"0\"]";
+				}
+			}
+			catch (Exception ex)
+			{
+				logger.Error(ex, "Error when opening a folder.");
+				_ = await Electron.Dialog.ShowMessageBoxAsync(new MessageBoxOptions(localizer["Error when opening the folder: {0}", ex.Message])
+				{
+					Type = MessageBoxType.error
+				});
+			}
+		}
+
+		private void ExitApp()
+		{
+			Electron.App.Quit();
+		}
+
+		private async Task Item_Selected(TreeViewItem<Photo> item)
+		{
+			try
+			{
+				gridData = await photoLabelerService.GetGridFromTreeViewItemAsync(item);
+			}
+			catch (Exception ex)
+			{
+				var options = new MessageBoxOptions(localizer["Error getting the photos from the directory: {0}.", ex.Message])
+				{
+					Type = MessageBoxType.error
+				};
+				_ = await Electron.Dialog.ShowMessageBoxAsync(options);
+			}
+		}
+
+		private void CheckPhotoFilter(ChangeEventArgs e)
+		{
+			if (gridData != null && gridData.Body.Rows.Any())
+			{
+				if (e.Value is bool bValue && bValue)
+				{
+					gridData.Body.Rows.ForEach(r =>
+					{
+						if (r.Cells.First().Text == "Sin etiqueta")
+						{
+							r.Visible = false;
+							var selectedCell = r.Cells.SingleOrDefault(c => c.Selected);
+							if (selectedCell != null)
+							{
+								var otherRow = r.GetPreviousRow();
+								if (r is null)
+								{
+									otherRow = r.GetNextRow();
+								}
+								if (otherRow == null)
+								{
+									otherRow = r.Grid.Header.Row;
+								}
+								selectedCell.Selected = false;
+								otherRow.Cells[selectedCell.CellIndex].Selected = true;
+							}
+						}
+					});
+				}
+				else
+				{
+					gridData.Body.Rows.ForEach(r => r.Visible = true);
+				}
+			}
+		}
+
+		private async Task RenamePhotosAsync()
+		{
+			var numberOfLabeledPhotos = treeViewItems.SelectedItem.Items.Count(i => !string.IsNullOrWhiteSpace(i.Label));
+			if (numberOfLabeledPhotos == 0)
+			{
+				var options = new MessageBoxOptions(localizer["There are no photos labeled for renaming."])
+				{
+					Type = MessageBoxType.warning,
+				};
+				_ = await Electron.Dialog.ShowMessageBoxAsync(options);
+				return;
+			}
+			var renamingOptions = new MessageBoxOptions(
+				localizer["{0} photos are to be renamed. " +
+				"Do you wish to continue? Please note that the original names of the photos will be changed " +
+				"and the operation cannot be undone.", numberOfLabeledPhotos])
+			{
+				Type = MessageBoxType.question,
+				Buttons = new string[] { localizer["Rename photos"], localizer["Cancel"] },
+				Title = localizer["Question"],
+			};
+			var result = await Electron.Dialog.ShowMessageBoxAsync(renamingOptions);
+			if (result.Response == 0)
+			{
+				string operationResultMessage;
+				var renamingResult = await photoLabelerService.RenamePhotosInFolder(treeViewItems.SelectedItem);
+				if (renamingResult.ErrorCount > 0)
+				{
+					operationResultMessage = localizer["Operation performed with errors. {0} photos have been renamed, and  {1}. Error/s have occurred: {2}.",
+				   renamingResult.FilesRenamed, renamingResult.ErrorCount,
+				   string.Join(Environment.NewLine, renamingResult.Errors)];
+				}
+				else
+				{
+					operationResultMessage = localizer["Operation successfully completed! {0} photos have been renamed.", renamingResult.FilesRenamed];
+				}
+
+				var resultDialogOptions = new MessageBoxOptions(operationResultMessage)
+				{
+					Type = renamingResult.ErrorCount > 0 ? MessageBoxType.warning : MessageBoxType.info,
+					Title = localizer[renamingResult.ErrorCount > 0 ? "Operation performed with errors" : "Done!"],
+				};
+				_ = await Electron.Dialog.ShowMessageBoxAsync(resultDialogOptions);
+				treeViewItems = null;
+				gridData = null;
+			}
+		}
+	}
+}

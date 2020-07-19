@@ -1,96 +1,86 @@
 ﻿@using PhotoLabeler.Components.Extensions;
 @using Microsoft.AspNetCore.Components.Web;
 
-@if (Cell is PhotoLabeler.Entities.Grid.GridCellLink)
+@if (Cell is PhotoLabeler.Entities.Grid.GridCellLink link)
 {
-    <a href="@Cell.Link" 
-       @onkeydown="@( (KeyboardEventArgs e) => Item_KeyDown(e) )" 
-       tabindex="@( Cell.Selected?"0":"-1")"
-    >
-        @Cell.Text
-    </a>
+	<a href="@link.Link"
+	   @onkeydown="@( (KeyboardEventArgs e) => Item_KeyDown(e) )"
+	   tabindex="@( Cell.Selected?"0":"-1")">
+		@Cell.Text
+	</a>
 }
-else if (Cell is PhotoLabeler.Entities.Grid.GridCellPict CellPict) 
+else if (Cell is PhotoLabeler.Entities.Grid.GridCellPict cellPict)
 {
-    if (!String.IsNullOrEmpty(Cell.Text)) 
-    {        
-        <img @onkeydown="@( (KeyboardEventArgs e) => Item_KeyDown(e) )" 
-            tabindex="@( Cell.Selected?"0":"-1")"
-            src="@CellPict.SrcBase64"
-            alt="@Cell.Text"
-            style="width: 100px; heigh: 100px;"
-        />
-    }
-    else
-    {
-
-    }
-
+	<img @onkeydown="@( (KeyboardEventArgs e) => Item_KeyDown(e) )"
+		 tabindex="@( cellPict.Selected?"0":"-1")"
+		 src="@cellPict.SrcBase64"
+		 alt="@(String.IsNullOrWhiteSpace(cellPict.Text) ? cellPict.Src: cellPict.Text)"
+		 style="width: 100px; height: 100px;" />
 }
-else 
+else
 {
-    <span @onkeydown="@( (KeyboardEventArgs e) => Item_KeyDown(e) )" 
-          tabindex="@( Cell.Selected?"0":"-1")">
-        @Cell.Text
-    </span>
+	<span @onkeydown="@( (KeyboardEventArgs e) => Item_KeyDown(e) )"
+		  tabindex="@( Cell.Selected?"0":"-1")">
+		@Cell.Text
+	</span>
 }
 
 @code
 {
-    [Parameter] public Entities.Grid.GridCell Cell { get; set; }
-    [Parameter] public RenderFragment fragment { get; set; }
-    [Parameter] public Action<bool> RefreshGrid { get; set; }
+	[Parameter] public Entities.Grid.GridCell Cell { get; set; }
+	[Parameter] public RenderFragment fragment { get; set; }
+	[Parameter] public Action<bool> RefreshGrid { get; set; }
 
-    private void Item_KeyDown(KeyboardEventArgs e)
-    {
-        var focus = false;
-        Entities.Grid.GridCell newSelectedCell = null;
+	private void Item_KeyDown(KeyboardEventArgs e)
+	{
+		var focus = false;
+		Entities.Grid.GridCell newSelectedCell = null;
 
-        switch (e.Key)
-        {
-            case "ArrowLeft":
-                if (Cell.CellIndex == 0)
-                {
-                    return;
-                }
-                newSelectedCell = Cell.Row.Cells[Cell.CellIndex - 1];
-                break;
-            case "ArrowRight":
-                if (Cell.CellIndex == Cell.Row.Cells.Count - 1)
-                {
-                    return;
-                }
-                newSelectedCell = Cell.Row.Cells[Cell.CellIndex + 1];
-                break;
-            case "ArrowUp":
-                var previousRow = Cell.Row.GetPreviousRow();
-                if (previousRow == null)
-                {
-                    return;
-                }
-                newSelectedCell = previousRow.Cells[Cell.CellIndex];
-                break;
-            case "ArrowDown":
-                var nextRow = Cell.Row.GetNextRow();
-                if (nextRow == null)
-                {
-                    return;
-                }
-                newSelectedCell = nextRow.Cells[Cell.CellIndex];
-                break;
-            default:
-                break;
-        }
+		switch (e.Key)
+		{
+			case "ArrowLeft":
+				if (Cell.CellIndex == 0)
+				{
+					return;
+				}
+				newSelectedCell = Cell.Row.Cells[Cell.CellIndex - 1];
+				break;
+			case "ArrowRight":
+				if (Cell.CellIndex == Cell.Row.Cells.Count - 1)
+				{
+					return;
+				}
+				newSelectedCell = Cell.Row.Cells[Cell.CellIndex + 1];
+				break;
+			case "ArrowUp":
+				var previousRow = Cell.Row.GetPreviousRow();
+				if (previousRow == null)
+				{
+					return;
+				}
+				newSelectedCell = previousRow.Cells[Cell.CellIndex];
+				break;
+			case "ArrowDown":
+				var nextRow = Cell.Row.GetNextRow();
+				if (nextRow == null)
+				{
+					return;
+				}
+				newSelectedCell = nextRow.Cells[Cell.CellIndex];
+				break;
+			default:
+				break;
+		}
 
-        if (newSelectedCell != null)
-        {
-            Cell.Selected = false;
-            newSelectedCell.Selected = true;
-        }
-        focus = newSelectedCell != null;
-        RefreshGrid(focus);
+		if (newSelectedCell != null)
+		{
+			Cell.Selected = false;
+			newSelectedCell.Selected = true;
+		}
+		focus = newSelectedCell != null;
+		RefreshGrid(focus);
 
-    }
+	}
 
 }
 

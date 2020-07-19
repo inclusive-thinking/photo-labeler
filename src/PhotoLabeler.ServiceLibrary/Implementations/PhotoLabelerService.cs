@@ -14,9 +14,6 @@ using PhotoLabeler.Entities;
 using PhotoLabeler.PhotoStorageReader.Interfaces;
 using PhotoLabeler.ServiceLibrary.Exceptions;
 using PhotoLabeler.ServiceLibrary.Interfaces;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats.Jpeg;
-using SixLabors.ImageSharp.Processing;
 namespace PhotoLabeler.ServiceLibrary.Implementations
 {
 	public class PhotoLabelerService : IPhotoLabelerService
@@ -189,7 +186,8 @@ namespace PhotoLabeler.ServiceLibrary.Implementations
 
 				var pictCell = new Grid.GridCellPict(cellIndex: row.Cells.Count, row: row, grid: grid)
 				{
-					Text = Path.GetFileName(photo.Path),
+					Text = photo.Label,
+					Src = photo.Path,
 					SrcBase64 = img,
 				};
 				row.Cells.Add(pictCell);
