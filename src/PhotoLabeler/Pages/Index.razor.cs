@@ -13,7 +13,7 @@ using PhotoLabeler.Entities;
 
 namespace PhotoLabeler.Pages
 {
-	public partial class Index
+	public partial class Index: IDisposable
 	{
 		private string selectedFile;
 
@@ -24,11 +24,9 @@ namespace PhotoLabeler.Pages
 		private string statusText = string.Empty;
 
 		protected override async Task OnInitializedAsync()
-		{
-			menuService.MnuFileOpenFolderClick += async () =>
-			{
-				await SelectDirectory();
-			};
+		{			
+			menuService.MnuFileOpenFolderClick += SelectDirectory;
+
 			menuService.MnuLanguagesItemClick += async (e) =>
 			{
 				await appConfigRepository.SetEntryAsync(PhotoLabeler.Constants.ConfigConstants.LanguageConfigKey, e.CultureName);
@@ -41,14 +39,15 @@ namespace PhotoLabeler.Pages
 
 		private async Task SelectDirectory()
 		{
+			
 			try
 			{
 				var mainWindow = Electron.WindowManager.BrowserWindows.First();
 				var options = new OpenDialogOptions
 				{
 					Properties = new OpenDialogProperty[] {
-			OpenDialogProperty.openDirectory,
-		},
+						OpenDialogProperty.openDirectory,
+					},
 					Title = localizer["Choose the directory which contains the photos"]
 				};
 				string[] files = await Electron.Dialog.ShowOpenDialogAsync(mainWindow, options);
@@ -175,5 +174,26 @@ namespace PhotoLabeler.Pages
 				gridData = null;
 			}
 		}
+
+		private bool _disposed = false;
+		public override void Dispose() => Dispose(true);
+		protected virtual void Dispose(bool disposing)
+		{
+			if (_disposed)
+			{
+				return;
+			}
+
+			if (disposing)
+			{
+				menuService.MnuFileOpenFolderClick -= SelectDirectory;
+				base.Dispose();
+			}
+
+			_disposed = true;
+		}
+
+
+
 	}
 }

@@ -20,12 +20,17 @@
 @inject NavigationManager navigationManager
 @inject IStringLocalizer<Index> localizer
 <div role="application">
-	<h1>Photo Labeler</h1>
-	<ul>
-		<li><button @onclick="SelectDirectory">@localizer["Open folder"]</button></li>
-		<li><button @onclick="ExitApp">@localizer["Exit"]</button></li>
-	</ul>
-
+	<div id="top-banner">
+		<h1 id="app-name" class="top-banner-item-left">Photo Labeler</h1>
+		<ul class="top-menu top-banner-item-left">
+			<li>
+				<button @onclick="SelectDirectory">@localizer["Open folder"]</button>
+			</li>
+			<li>
+				<button @onclick="ExitApp">@localizer["Exit"]</button>
+			</li>
+		</ul>
+	</div>
 	@if (treeViewItems != null)
 	{
 		<TreeView Model="@treeViewItems" Id="treeViewPhotos" OnItemSelected="@Item_Selected" />
@@ -38,3 +43,40 @@
 	}
 </div>
 <div role="status">@statusText</div>
+
+<style>
+	#top-banner {
+		height: 50px;
+		position: sticky;
+		top: 0;
+		width: 100%;
+		display: flex;
+		flex-direction: row;
+		background-color: white;
+    	box-shadow: 0px 8px 11px 0px #bebebe;
+    	padding-left: 20px;
+    	border-radius: 10px;
+		margin-bottom: 20px;
+	}
+
+	.top-banner-item-left {
+		justify-content: flex-start;
+		margin: 0;
+	}
+
+	.top-menu {
+		list-style-type: none;
+		margin: 0;
+    	padding-top: 10px;
+		display: flex;
+	}
+
+	.top-menu li {
+		margin-right: 20px;
+	}
+
+	.top-menu li button {
+		background-color: white;
+		border-radius: 4px;
+	}
+</style>

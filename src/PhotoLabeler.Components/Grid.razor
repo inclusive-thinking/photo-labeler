@@ -1,15 +1,44 @@
-﻿<table role="grid" id="@Id">
-	@if (!string.IsNullOrWhiteSpace(Model.Caption))
-	{
-		<caption>@Model.Caption</caption>
-	}
-	<thead>
-		<GridRow Row="@Model.Header.Row" RefreshGrid="@RefreshGrid" />
-	</thead>
-	<tbody>
-		@foreach (var row in Model.Body.Rows.Where(r => r.Visible))
+﻿<div class="main-grid">
+	<table role="grid" id="@Id">
+		@if (!string.IsNullOrWhiteSpace(Model.Caption))
 		{
-			<GridRow Row="@row"  RefreshGrid="@RefreshGrid"/>
+			<caption>@Model.Caption</caption>
 		}
-	</tbody>
-</table>
+		<thead>
+			<GridRow Row="@Model.Header.Row" RefreshGrid="@RefreshGrid" />
+		</thead>
+		<tbody>
+			@foreach (var row in Model.Body.Rows.Where(r => r.Visible))
+			{
+				<GridRow Row="@row"  RefreshGrid="@RefreshGrid"/>
+			}
+		</tbody>
+	</table>
+</div>
+
+<style>
+	.main-grid {
+		border: 1px solid #e0e0e0;
+		border-radius: 10px;
+		margin-bottom: 10px;
+		width: 100%;
+		padding: 5px;		
+	}
+
+	.main-grid table {
+		width: 100%;
+	}
+
+	.main-grid table, .main-grid th, .main-grid td {
+		padding: 5px;
+	}
+
+	.main-grid td:not(:first-child) {
+		border-bottom: 1px solid #e0e0e0;
+	}
+
+	.main-grid td:first-child {
+		width: 120px;
+	}
+
+</style>

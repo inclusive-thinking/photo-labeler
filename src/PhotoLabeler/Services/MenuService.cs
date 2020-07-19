@@ -132,7 +132,7 @@ namespace PhotoLabeler.Services
 		}
 
 		private Task OnOpenFolder()
-		{
+		{			
 			return MnuFileOpenFolderClick?.Invoke();
 		}
 	}
