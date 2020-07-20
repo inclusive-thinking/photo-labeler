@@ -23,6 +23,8 @@ namespace PhotoLabeler.Pages
 
 		private string statusText = string.Empty;
 
+		private PhotoLabeler.Components.Grid GridRef =null;
+
 		protected override async Task OnInitializedAsync()
 		{			
 			menuService.MnuFileOpenFolderClick += SelectDirectory;
@@ -80,8 +82,15 @@ namespace PhotoLabeler.Pages
 
 		private async Task Item_Selected(TreeViewItem<Photo> item)
 		{
-			try
+			try			
 			{
+				// clear previous data
+				GridRef?.Cancel();
+				gridData = null;					
+				StateHasChanged();			
+				await Task.Delay(1);
+
+				// new data
 				gridData = await photoLabelerService.GetGridFromTreeViewItemAsync(item);
 			}
 			catch (Exception ex)

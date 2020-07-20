@@ -1,12 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
 namespace PhotoLabeler.Components
 {
+	internal class VisibleItem
+	{
+		public Entities.Grid.GridRow item {get; set;} = null;
+		public GridRow reference {get; set;} = null;
+	}
+
 	public partial class Grid: IDisposable
 	{
 		[Inject]
@@ -20,43 +27,64 @@ namespace PhotoLabeler.Components
 
 		private bool focusOnItemAfterRender = false;
 		
-		private List<(Entities.Grid.GridRow row, GridRow reference)> VisibleItems {set; get;}
+		private List<VisibleItem> VisibleItems {set; get;}
 
+		private ulong _parmVersion = 0;
+		private ulong _parmVersionLastRendered = 0;
+		CancellationTokenSource cts = new CancellationTokenSource();
+		public void Cancel() => cts.Cancel();		
 		protected override async Task OnParametersSetAsync()
-		{
+		{			
+			_parmVersion++;
 			VisibleItems = 
 				Model
 				.Body
 				.Rows
 				.Where(r => r.Visible)
-				.Select(r => (r, (GridRow)null ) )
-				.ToList();			
-			newParm = true;
+				.Select(r => new VisibleItem { item= r } )
+				.ToList();						
 			await Task.CompletedTask;
 		}
 
 		protected override async Task OnAfterRenderAsync(bool firstRender)
 		{
 			await base.OnAfterRenderAsync(firstRender);
+
 			if (focusOnItemAfterRender)
 			{
 				await jsRuntime.InvokeVoidAsync("jsInteropFunctions.focusSelectedItemInsideContainer", this.Id);
 			}
-			if (newParm)
-			{
-				newParm= false;
-				await RefillImages();				
-			}
+
+			cts.Cancel();		
+			cts = new CancellationTokenSource();
+			RefillImages(cts.Token);				
+
 		}
 
-        private async Task RefillImages()
-        {
-            foreach(var row in Model.Body.Rows.Where(r => r.Visible).ToList())
+        private async void RefillImages(CancellationToken myToken)
+        {	
+			// current grid parameters version
+			var filling = _parmVersion;
+
+			// is refilling needed?
+			var noNeedToRefillImages = _parmVersion <= _parmVersionLastRendered;
+			if (noNeedToRefillImages) return;
+
+			// local version of items
+			var copyOfVisibleItems = VisibleItems.ToList();
+			
+			// are references availables?
+			var referencesAreAvailables = copyOfVisibleItems.FirstOrDefault()?.reference == null;
+			if (referencesAreAvailables) return;
+
+			// let's try to fill
+			_parmVersionLastRendered=filling;
+            foreach(var vi in copyOfVisibleItems)
 			{
-				var cell = row.Cells.First() as Entities.Grid.GridCellPict;
-				await cell.ReloadImage();
-				if (_disposed) return;
-				StateHasChanged();
+				var fillingWrongVersion = filling != _parmVersion;
+				if (fillingWrongVersion || _disposed || myToken.IsCancellationRequested) return;
+				await Task.Delay(1);
+				await vi.reference.ReloadImage();				
 			}
         }
 
@@ -66,8 +94,7 @@ namespace PhotoLabeler.Components
 			InvokeAsync(() => StateHasChanged());
 		}
 
-		private bool _disposed = false;
-        private bool newParm = false;
+		private bool _disposed = false;        
 
         public  void Dispose() => Dispose(true);
 		protected virtual void Dispose(bool disposing)
@@ -79,7 +106,7 @@ namespace PhotoLabeler.Components
 
 			if (disposing)
 			{
-				
+				cts.Cancel();
 			}
 
 			_disposed = true;
