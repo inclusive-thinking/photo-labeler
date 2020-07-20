@@ -5,12 +5,12 @@ using PhotoLabeler.ServiceLibrary.Implementations;
 
 namespace PhotoLabeler.Console
 {
-	class Program
+	public static class Program
 	{
 		static async Task Main()
 		{
 			var service = new PhotoInfoService();
-			var photo = await service.GetPhotoFromFileAsync(@"c:\users\jmontiel\google drive\fotos\2. Amberso DNI Juanjo.JPG");
+			var photo = await service.GetPhotoFromFileAsync(@"c:\users\jmontiel\google drive\fotos\img_0566.jpg");
 			System.Console.ReadLine();
 		}
 

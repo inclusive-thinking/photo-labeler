@@ -16,7 +16,9 @@ namespace PhotoLabeler.ServiceLibrary.Implementations
 	public class PhotoInfoService : IPhotoInfoService
 	{
 
-		private const string ExifDateTimeFormat = "yyyy-MM-dd HH:mm:SS";
+		private const string ExifDateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+
+		private const string ExifDateTimeFormat2 = "yyyy:MM:dd HH:mm:ss";
 
 		private const string QuickTimeMetaDataCreationDateTag = "Creation Date";
 
@@ -30,6 +32,8 @@ namespace PhotoLabeler.ServiceLibrary.Implementations
 
 		private const string GPSAltitudeTagName = "GPS Altitude";
 
+
+		private const string ExifDateTimeTagName = "Date/Time";
 		private readonly Regex _regexDegrees = new Regex(@"^(?<hours>\-?\d+)°\s(?<minutes>[\d,]+?)'\s(?<seconds>[\d\,]+)", RegexOptions.Compiled);
 
 		private readonly Regex _regexAltitude = new Regex(@"^(?<altitude>\-?\d+\.?\d+) metres?", RegexOptions.Compiled);
@@ -128,10 +132,17 @@ namespace PhotoLabeler.ServiceLibrary.Implementations
 
 		private void AddDatesFromExifDir(Directory directory, Photo photo)
 		{
-			var tag = directory.Tags.SingleOrDefault(t => t.Name == "Date/Time");
-			if (!string.IsNullOrWhiteSpace(tag?.Description) && DateTime.TryParseExact(tag.Description, ExifDateTimeFormat, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out DateTime creationDate))
+			var tag = directory.Tags.SingleOrDefault(t => t.Name == ExifDateTimeTagName);
+			if (!string.IsNullOrWhiteSpace(tag?.Description))
 			{
-				photo.TakenDate = creationDate;
+				if (DateTime.TryParseExact(tag.Description, ExifDateTimeFormat, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out DateTime creationDate))
+				{
+					photo.TakenDate = creationDate;
+				}
+				else if (DateTime.TryParseExact(tag.Description, ExifDateTimeFormat2, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out DateTime creationDate2))
+				{
+					photo.TakenDate = creationDate2;
+				}
 			}
 		}
 
