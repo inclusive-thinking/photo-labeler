@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Juanjo Montiel and contributors. All Rights Reserved. Licensed under the GNU General Public License, Version 2.0. See LICENSE in the project root for license information.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
@@ -13,36 +12,36 @@ using PhotoLabeler.Entities;
 
 namespace PhotoLabeler.Pages
 {
-	public partial class Index: IDisposable
+	public partial class Index : IDisposable
 	{
-		private string selectedFile;
+		private string _selectedFile;
 
-		private Entities.TreeView<Photo> treeViewItems;
+		private TreeView<Photo> _treeViewItems;
 
-		private Entities.Grid gridData = null;
+		private Grid _gridData = null;
 
-		private string statusText = string.Empty;
+		private string _statusText = string.Empty;
 
 		protected override async Task OnInitializedAsync()
-		{			
+		{
 			menuService.MnuFileOpenFolderClick += SelectDirectory;
 
 			menuService.MnuLanguagesItemClick += SelectLanguage;
-			
+
 			menuService.CreateMenus();
 			QuerySelectorToFocusAfterRendering = "button";
 			await base.OnInitializedAsync();
 		}
 
-        private async Task SelectLanguage(LanguageEventArgs e)
-        {
-			await appConfigRepository.SetEntryAsync(PhotoLabeler.Constants.ConfigConstants.LanguageConfigKey, e.CultureName);
-			navigationManager.NavigateTo($"/Language/?cultureName={HttpUtility.UrlEncode(e.CultureName)}&redirectUri=%2F", true);
-        }
-
-        private async Task SelectDirectory()
+		private async Task SelectLanguage(LanguageEventArgs e)
 		{
-			
+			await appConfigRepository.SetEntryAsync(Constants.ConfigConstants.LanguageConfigKey, e.CultureName);
+			navigationManager.NavigateTo($"/Language/?cultureName={HttpUtility.UrlEncode(e.CultureName)}&redirectUri=%2F", true);
+		}
+
+		private async Task SelectDirectory()
+		{
+
 			try
 			{
 				var mainWindow = Electron.WindowManager.BrowserWindows.First();
@@ -56,10 +55,10 @@ namespace PhotoLabeler.Pages
 				string[] files = await Electron.Dialog.ShowOpenDialogAsync(mainWindow, options);
 				if (files.Length > 0)
 				{
-					selectedFile = files[0];
-					statusText = localizer["Loading directories..."];
-					treeViewItems = await photoLabelerService.GetPhotosFromDirAsync(selectedFile);
-					statusText = localizer["Directories loaded"];
+					_selectedFile = files[0];
+					_statusText = localizer["Loading directories..."];
+					_treeViewItems = await photoLabelerService.GetPhotosFromDirAsync(_selectedFile);
+					_statusText = localizer["Directories loaded"];
 					QuerySelectorToFocusAfterRendering = "#treeViewPhotos [tabindex=\"0\"]";
 				}
 			}
@@ -82,7 +81,7 @@ namespace PhotoLabeler.Pages
 		{
 			try
 			{
-				gridData = await photoLabelerService.GetGridFromTreeViewItemAsync(item);
+				_gridData = await photoLabelerService.GetGridFromTreeViewItemAsync(item);
 			}
 			catch (Exception ex)
 			{
@@ -96,11 +95,11 @@ namespace PhotoLabeler.Pages
 
 		private void CheckPhotoFilter(ChangeEventArgs e)
 		{
-			if (gridData != null && gridData.Body.Rows.Any())
+			if (_gridData != null && _gridData.Body.Rows.Any())
 			{
 				if (e.Value is bool bValue && bValue)
 				{
-					gridData.Body.Rows.ForEach(r =>
+					_gridData.Body.Rows.ForEach(r =>
 					{
 						if (r.Cells.First().Text == "Sin etiqueta")
 						{
@@ -125,14 +124,14 @@ namespace PhotoLabeler.Pages
 				}
 				else
 				{
-					gridData.Body.Rows.ForEach(r => r.Visible = true);
+					_gridData.Body.Rows.ForEach(r => r.Visible = true);
 				}
 			}
 		}
 
 		private async Task RenamePhotosAsync()
 		{
-			var numberOfLabeledPhotos = treeViewItems.SelectedItem.Items.Count(i => !string.IsNullOrWhiteSpace(i.Label));
+			var numberOfLabeledPhotos = _treeViewItems.SelectedItem.Items.Count(i => !string.IsNullOrWhiteSpace(i.Label));
 			if (numberOfLabeledPhotos == 0)
 			{
 				var options = new MessageBoxOptions(localizer["There are no photos labeled for renaming."])
@@ -155,7 +154,7 @@ namespace PhotoLabeler.Pages
 			if (result.Response == 0)
 			{
 				string operationResultMessage;
-				var renamingResult = await photoLabelerService.RenamePhotosInFolder(treeViewItems.SelectedItem);
+				var renamingResult = await photoLabelerService.RenamePhotosInFolder(_treeViewItems.SelectedItem);
 				if (renamingResult.ErrorCount > 0)
 				{
 					operationResultMessage = localizer["Operation performed with errors. {0} photos have been renamed, and  {1}. Error/s have occurred: {2}.",
@@ -173,8 +172,8 @@ namespace PhotoLabeler.Pages
 					Title = localizer[renamingResult.ErrorCount > 0 ? "Operation performed with errors" : "Done!"],
 				};
 				_ = await Electron.Dialog.ShowMessageBoxAsync(resultDialogOptions);
-				treeViewItems = null;
-				gridData = null;
+				_treeViewItems = null;
+				_gridData = null;
 			}
 		}
 

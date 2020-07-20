@@ -3,7 +3,6 @@
 using System.Data;
 using System.Threading.Tasks;
 using ElectronNET.API;
-using ElectronNET.API.Entities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Localization;
@@ -56,6 +55,7 @@ namespace PhotoLabeler
 				options.ResourcesPath = "Resources";
 			});
 			services.AddSingleton<IPhotoLabelerService, PhotoLabelerService>();
+			services.AddSingleton<IPhotoInfoService, PhotoInfoService>();
 			services.AddSingleton<IPhotoReader, PhotoReaderBase64>();
 			services.AddSingleton<IMenuService, MenuService>();
 			services.AddSingleton<IDbConnection>((serviceProvider) =>
@@ -90,14 +90,6 @@ namespace PhotoLabeler
 				endpoints.MapFallbackToPage("/_Host");
 			});
 			Electron.App.CommandLine.AppendSwitch("disable -http-cache");
-
-			//var browserWindowOptions = new BrowserWindowOptions
-			//{
-			//    WebPreferences = new WebPreferences
-			//    {
-			//        WebSecurity = false,
-			//    },
-			//};
 
 			Task.Run(async () => await Electron.WindowManager.CreateWindowAsync(
 				//browserWindowOptions,

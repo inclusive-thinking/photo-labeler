@@ -7,8 +7,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using MetadataExtractor;
-using MetadataExtractor.Formats.Xmp;
 using Microsoft.Extensions.Localization;
 using PhotoLabeler.Entities;
 using PhotoLabeler.PhotoStorageReader.Interfaces;
@@ -18,14 +16,11 @@ namespace PhotoLabeler.ServiceLibrary.Implementations
 {
 	public class PhotoLabelerService : IPhotoLabelerService
 	{
-
-		private const string QuickTimeMetadataDescriptionTag = "Description";
-
-		private const string QuickTimeMetaDataCreationDateTag = "Creation Date";
-
 		private const int MaxFileNameLength = 260;
+		private readonly IPhotoInfoService _photoInfoService;
 
 		private readonly IStringLocalizer<PhotoLabelerService> _localizer;
+
 		private readonly IPhotoReader _photoReader;
 
 		/// <summary>
@@ -33,10 +28,12 @@ namespace PhotoLabeler.ServiceLibrary.Implementations
 		/// </summary>
 		/// <param name="localizer">The localizer.</param>
 		public PhotoLabelerService(
+			IPhotoInfoService photoInfoService,
 			IStringLocalizer<PhotoLabelerService> localizer,
 			IPhotoReader photoReader
 			)
 		{
+			_photoInfoService = photoInfoService;
 			_localizer = localizer;
 			_photoReader = photoReader;
 		}
@@ -53,7 +50,7 @@ namespace PhotoLabeler.ServiceLibrary.Implementations
 		{
 			TreeView<Photo> treeView = new TreeView<Photo>();
 			directory = directory.TrimEnd(new[] { Path.DirectorySeparatorChar });
-			var directoriesFound = await Task.Run(() => System.IO.Directory.GetDirectories(directory, string.Empty, SearchOption.AllDirectories));
+			var directoriesFound = await Task.Run(() => Directory.GetDirectories(directory, string.Empty, SearchOption.AllDirectories));
 			var dirLength = directory.Length;
 			var directories = directoriesFound.Select(i => i.Substring(dirLength + 1)).OrderBy(i => i.Length).ThenBy(i => i).ToList();
 			directories.Insert(0, string.Empty);
@@ -115,7 +112,7 @@ namespace PhotoLabeler.ServiceLibrary.Implementations
 		/// <param name="item">The item.</param>
 		public async Task AddFilesToTreeViewItemAsync(TreeViewItem<Photo> item)
 		{
-			var files = await Task.Run(() => System.IO.Directory.GetFiles(item.Path, string.Empty, SearchOption.TopDirectoryOnly));
+			var files = await Task.Run(() => Directory.GetFiles(item.Path, string.Empty, SearchOption.TopDirectoryOnly));
 			var supportedExtensions = new[] { ".jpg", ".heic", ".mov", ".png", ".gif", ".jpeg", ".tiff", ".raw", ".mp4" };
 			var filteredFiles = files.Where(i => supportedExtensions.Contains(Path.GetExtension(i.ToLower())));
 			using (var semaphore = new SemaphoreSlim(200))
@@ -125,7 +122,7 @@ namespace PhotoLabeler.ServiceLibrary.Implementations
 					try
 					{
 						await semaphore.WaitAsync();
-						return await GetPhotoFromFileAsync(i);
+						return await _photoInfoService.GetPhotoFromFileAsync(i);
 					}
 					finally
 					{
@@ -259,128 +256,6 @@ namespace PhotoLabeler.ServiceLibrary.Implementations
 
 
 
-		private async Task<Photo> GetPhotoFromFileAsync(string file)
-		{
-			List<string> labels = new List<string>();
-			IReadOnlyList<MetadataExtractor.Directory> data = null;
-			try
-			{
-				data = await Task.Run(() => ImageMetadataReader.ReadMetadata(file));
-			}
-			catch
-			{
-				return null;
-			}
-			if (data == null)
-			{
-				return null;
-			}
-
-			var photo = new Photo { Path = file };
-			data.Where(d => d.Name == "XMP").ToList().ForEach(xmpData =>
-			{
-				AddLabelFromXmpDescription(labels, xmpData);
-				AddDates(xmpData, photo);
-			});
-
-			var exifDir = data.SingleOrDefault(i => i.Name == "Exif IFD0");
-			if (exifDir != null)
-			{
-				AddMetadataLabel(labels, exifDir, "Image Description");
-				AddMetadataLabel(labels, exifDir, "Windows XP Subject");
-				AddMetadataLabel(labels, exifDir, "Windows XP Title");
-				AddMetadataLabel(labels, exifDir, "Windows XP Comment");
-				if (!photo.TakenDate.HasValue)
-				{
-					AddExifDates(exifDir, photo);
-				}
-			}
-
-			var quickTimeMeta = data.SingleOrDefault(d => d.Name == "QuickTime Metadata Header");
-			if (quickTimeMeta != null)
-			{
-				var descriptionTag = quickTimeMeta.Tags.SingleOrDefault(t => t.Name == QuickTimeMetadataDescriptionTag);
-				if (descriptionTag != null)
-				{
-					var value = (StringValue)quickTimeMeta.GetObject(descriptionTag.Type);
-					labels.Add(value.ToString());
-				}
-				if (!photo.TakenDate.HasValue)
-				{
-					AddQuickTimeMetaCreationDate(quickTimeMeta, photo);
-				}
-			}
-
-			labels = labels.Distinct().ToList();
-			if (labels.Any())
-			{
-				photo.Label = string.Join(Environment.NewLine, labels);
-			}
-			return photo;
-		}
-
-		private void AddQuickTimeMetaCreationDate(MetadataExtractor.Directory quickTimeMeta, Photo photo)
-		{
-			var tag = quickTimeMeta.Tags.SingleOrDefault(t => t.Name == QuickTimeMetaDataCreationDateTag);
-			if (tag != null)
-			{
-				var tagValue = (StringValue)quickTimeMeta.GetObject(tag.Type);
-				if (DateTime.TryParse(tagValue.ToString(), out DateTime creationDate))
-				{
-					photo.TakenDate = creationDate;
-				}
-			}
-		}
-
-		private void AddExifDates(MetadataExtractor.Directory directory, Photo photo)
-		{
-			var tag = directory.Tags.SingleOrDefault(t => t.Name == "Date/Time");
-			if (!string.IsNullOrWhiteSpace(tag?.Description) && DateTime.TryParse(tag.Description, out DateTime creationDate))
-			{
-				photo.TakenDate = creationDate;
-			}
-		}
-
-		private void AddDates(MetadataExtractor.Directory xmpData, Photo photo)
-		{
-			var xmpDirectory = xmpData as XmpDirectory;
-			var dateCreated = xmpDirectory.XmpMeta.Properties.SingleOrDefault(p => p.Path == "xmp:CreateDate");
-			var photoshopDateCreated = xmpDirectory.XmpMeta.Properties.SingleOrDefault(p => p.Path == "photoshop:DateCreated");
-			var dateModified = xmpDirectory.XmpMeta.Properties.SingleOrDefault(p => p.Path == "xmp:ModifyDate");
-			if (!string.IsNullOrWhiteSpace(dateCreated?.Value) && DateTime.TryParse(dateCreated.Value, out DateTime takenDate))
-			{
-				photo.TakenDate = takenDate;
-			}
-
-			if (!photo.TakenDate.HasValue && !string.IsNullOrWhiteSpace(photoshopDateCreated?.Value) && DateTime.TryParse(photoshopDateCreated.Value, out DateTime photoshopTakenDate))
-			{
-				photo.TakenDate = photoshopTakenDate;
-			}
-
-			if (!string.IsNullOrWhiteSpace(dateModified?.Value) && DateTime.TryParse(dateModified.Value, out DateTime modifiedDate))
-			{
-				photo.ModifiedDate = modifiedDate;
-			}
-		}
-
-		private void AddLabelFromXmpDescription(List<string> labels, MetadataExtractor.Directory xmpData)
-		{
-			var xmpDirectory = xmpData as XmpDirectory;
-			var artworkDesc = xmpDirectory.XmpMeta.Properties.SingleOrDefault(p => p.Path == "Iptc4xmpExt:ArtworkContentDescription");
-			if (artworkDesc != null)
-			{
-				labels.Add(artworkDesc.Value);
-			}
-		}
-
-		private void AddMetadataLabel(List<string> labels, MetadataExtractor.Directory exifDir, string tagName)
-		{
-			var tag = exifDir.Tags.SingleOrDefault(t => t.Name == tagName);
-			if (!string.IsNullOrWhiteSpace(tag?.Description))
-			{
-				labels.Add(tag.Description);
-			}
-		}
 		private async Task<bool> RenameItemAsync(string basePath, Photo photo, int prefixIndex, int totalFiles, bool addPrefix)
 		{
 			if (string.IsNullOrWhiteSpace(photo.Label))

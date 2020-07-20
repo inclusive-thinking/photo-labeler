@@ -17,7 +17,6 @@ namespace PhotoLabeler.PhotoStorageReader.Implementations
 			const int uiSize = 100;
 			var postedFileExtension = Path.GetExtension(path);
 
-			//{ ".jpg", ".heic", ".mov", ".png", ".gif", ".jpeg", ".tiff", ".raw", ".mp4" };
 			//tiff: still not supported https://github.com/SixLabors/ImageSharp/issues/12
 			//raw, heic: must test if supported
 			var supported_images = new[] { ".jpg", ".png", ".gif", ".jpeg", "bmp" };
@@ -49,11 +48,6 @@ namespace PhotoLabeler.PhotoStorageReader.Implementations
 
 					var b64 = image.ToBase64String(JpegFormat.Instance);
 
-					//if (path.EndsWith("file.png") || path.EndsWith("video.png") || path.EndsWith("image.png") || path.EndsWith("folder.png"))
-					//{
-					//    System.Console.WriteLine(path);
-					//    ChunksUpto(b64, 80).ToList().ForEach(c => System.Console.WriteLine("\"" + c + "\"+"));
-					//}
 
 					return b64;
 				}
@@ -80,10 +74,5 @@ namespace PhotoLabeler.PhotoStorageReader.Implementations
 				}
 			}
 		}
-		//static System.Collections.Generic.IEnumerable<string> ChunksUpto(string str, int maxChunkSize)
-		//{
-		//    for (int i = 0; i < str.Length; i += maxChunkSize)
-		//        yield return str.Substring(i, Math.Min(maxChunkSize, str.Length - i));
-		//}
 	}
 }
