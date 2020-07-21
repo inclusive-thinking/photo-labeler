@@ -4,6 +4,10 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Moq" Version="4.14.5" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PhotoLabeler.ServiceLibrary\PhotoLabeler.ServiceLibrary.csproj" />
   </ItemGroup>

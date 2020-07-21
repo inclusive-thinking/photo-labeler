@@ -8,10 +8,10 @@
 			<GridRow Row="@Model.Header.Row" RefreshGrid="@RefreshGrid" />
 		</thead>
 		<tbody>
-			@foreach (var visibleItem in VisibleItems)
+			@foreach (var visibleItem in _visibleItems)
 			{
 				var _visibleItem = visibleItem;
-				<GridRow Row="@_visibleItem.item" @ref="@_visibleItem.reference" RefreshGrid="@RefreshGrid"/>
+				<GridRow Row="@_visibleItem.Item" @ref="@_visibleItem.Reference" RefreshGrid="@RefreshGrid"/>
 			}
 		</tbody>
 	</table>

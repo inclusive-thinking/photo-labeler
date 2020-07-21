@@ -31,18 +31,18 @@
 			</li>
 		</ul>
 	</div>
-	@if (treeViewItems != null)
+	@if (_treeViewItems != null)
 	{
-		<TreeView Model="@treeViewItems" Id="treeViewPhotos" OnItemSelected="@Item_Selected" />
+		<TreeView Model="@_treeViewItems" Id="treeViewPhotos" OnItemSelected="@Item_Selected" />
 	}
-	@if (gridData != null)
+	@if (_gridData != null)
 	{
-		<PhotoLabeler.Components.Grid @ref="GridRef" Model="@gridData" />
+		<PhotoLabeler.Components.Grid @ref="_gridRef" Model="@_gridData" />
 		<input type="checkbox" id="chkFilterUnlabeledPhotos" @onchange="CheckPhotoFilter" /><label for="chkFilterUnlabeledPhotos">@localizer["Hide unlabeled photos."]</label>
 		<p><button @onclick="RenamePhotosAsync">@localizer["Rename photos"]</button></p>
 	}
 </div>
-<div role="status">@statusText</div>
+<div role="status">@_statusText</div>
 
 <style>
 	#top-banner {

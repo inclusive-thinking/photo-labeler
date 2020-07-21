@@ -48,7 +48,7 @@ namespace PhotoLabeler.Entities
 		/// <value>
 		/// The latitude.
 		/// </value>
-		public double Latitude { get; set; }
+		public double? Latitude { get; set; }
 
 		/// <summary>
 		/// Gets or sets the longitude.
@@ -56,7 +56,7 @@ namespace PhotoLabeler.Entities
 		/// <value>
 		/// The longitude.
 		/// </value>
-		public double Longitude { get; set; }
+		public double? Longitude { get; set; }
 
 		/// <summary>
 		/// Gets or sets the altitude.
@@ -64,7 +64,7 @@ namespace PhotoLabeler.Entities
 		/// <value>
 		/// The altitude.
 		/// </value>
-		public double Altitude { get; set; }
+		public double? AltitudeInMeters { get; set; }
 
 		/// <summary>
 		/// Gets or sets the location desc.

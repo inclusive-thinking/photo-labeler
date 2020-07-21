@@ -15,22 +15,3 @@
 		}
 	}
 </tr>
-
-@code
-{
-    [Parameter] public Entities.Grid.GridRow Row { get; set; }
-    [Parameter] public Action<bool> RefreshGrid { get; set; }
-
-	public async Task ReloadImage()
-	{
-		foreach(var cell in Row.Cells)
-		{
-			if (cell is Entities.Grid.GridCellPict cellPicct)
-			{
-				await cellPicct.ReloadImage();
-				await InvokeAsync( StateHasChanged );
-			}
-		}
-	}
-}
-

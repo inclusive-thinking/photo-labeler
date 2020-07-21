@@ -54,6 +54,8 @@ namespace PhotoLabeler.Entities
 				: base(cellIndex, row, grid)
 			{
 			}
+
+			public bool HasLabel { get; set; }
 		}
 
 		public class GridCellLink : GridCell
@@ -92,7 +94,7 @@ namespace PhotoLabeler.Entities
 			public string Src { get; set; }
 
 			public string SrcBase64 { get; set; }
-			public Func<Task> ReloadImage {get; set;} = null;
+			public Func<Task> ReloadImage { get; set; } = null;
 		}
 
 		public class GridRow
@@ -103,7 +105,7 @@ namespace PhotoLabeler.Entities
 				Grid = grid;
 			}
 
-			public string PicturePath {get; set; } = null;
+			public string PicturePath { get; set; } = null;
 
 			public List<GridCell> Cells { get; set; } = new List<GridCell>();
 
