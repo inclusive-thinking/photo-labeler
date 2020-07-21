@@ -37,7 +37,7 @@
 	}
 	@if (_gridData != null)
 	{
-		<PhotoLabeler.Components.Grid Model="@_gridData" />
+		<PhotoLabeler.Components.Grid @ref="_gridRef" Model="@_gridData" />
 		<input type="checkbox" id="chkFilterUnlabeledPhotos" @onchange="CheckPhotoFilter" /><label for="chkFilterUnlabeledPhotos">@localizer["Hide unlabeled photos."]</label>
 		<p><button @onclick="RenamePhotosAsync">@localizer["Rename photos"]</button></p>
 	}

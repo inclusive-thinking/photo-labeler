@@ -22,6 +22,8 @@ namespace PhotoLabeler.Pages
 
 		private string _statusText = string.Empty;
 
+		private Components.Grid _gridRef =null;
+
 		protected override async Task OnInitializedAsync()
 		{
 			menuService.MnuFileOpenFolderClick += SelectDirectory;
@@ -79,8 +81,15 @@ namespace PhotoLabeler.Pages
 
 		private async Task Item_Selected(TreeViewItem<Photo> item)
 		{
-			try
+			try			
 			{
+				// clear previous data
+				_gridRef?.Cancel();
+				_gridData = null;					
+				StateHasChanged();			
+				await Task.Delay(1);
+
+				// new data
 				_gridData = await photoLabelerService.GetGridFromTreeViewItemAsync(item);
 			}
 			catch (Exception ex)
@@ -101,7 +110,8 @@ namespace PhotoLabeler.Pages
 				{
 					_gridData.Body.Rows.ForEach(r =>
 					{
-						if (r.Cells.First().Text == "Sin etiqueta")
+						var labelCell = r.Cells.Single(c => c is Grid.GridCellLabel) as Grid.GridCellLabel;
+						if (!labelCell.HasLabel)
 						{
 							r.Visible = false;
 							var selectedCell = r.Cells.SingleOrDefault(c => c.Selected);
