@@ -63,10 +63,10 @@ namespace PhotoLabeler.Components
 
 			_cancellationTokenSource.Cancel();
 			_cancellationTokenSource = new CancellationTokenSource();
-			RefillImages(_cancellationTokenSource.Token);
+			_ = RefillImagesAsync(_cancellationTokenSource.Token);
 		}
 
-		private async void RefillImages(CancellationToken cancellationToken)
+		private async Task RefillImagesAsync(CancellationToken cancellationToken)
 		{
 			// current grid parameters version
 			var filling = _parmVersion;

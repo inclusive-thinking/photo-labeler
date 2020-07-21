@@ -22,7 +22,7 @@ namespace PhotoLabeler.Pages
 
 		private string _statusText = string.Empty;
 
-		private Components.Grid _gridRef =null;
+		private Components.Grid _gridRef = null;
 
 		protected override async Task OnInitializedAsync()
 		{
@@ -81,12 +81,12 @@ namespace PhotoLabeler.Pages
 
 		private async Task Item_Selected(TreeViewItem<Photo> item)
 		{
-			try			
+			try
 			{
 				// clear previous data
 				_gridRef?.Cancel();
-				_gridData = null;					
-				StateHasChanged();			
+				_gridData = null;
+				StateHasChanged();
 				await Task.Delay(1);
 
 				// new data

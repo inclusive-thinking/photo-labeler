@@ -32,8 +32,16 @@ namespace PhotoLabeler.ServiceLibrary.Implementations
 
 		private const string GPSAltitudeTagName = "GPS Altitude";
 
-
 		private const string ExifDateTimeTagName = "Date/Time";
+
+		private const string ExifDirName = "Exif IFD0";
+		private const string XmpDirName = "XMP";
+
+		private const string ExifSubDirName = "Exif SubIFD";
+
+		private const string ExifSubDateTimeTagName = "Date/Time Original";
+
+		private const string ExifSubDateTimeDigitizedTagName = "Date/Time Digitized";
 		private readonly Regex _regexDegrees = new Regex(@"^(?<hours>\-?\d+)°\s(?<minutes>[\d,]+?)'\s(?<seconds>[\d\,]+)", RegexOptions.Compiled);
 
 		private readonly Regex _regexAltitude = new Regex(@"^(?<altitude>\-?\d+\.?\d+) metres?", RegexOptions.Compiled);
@@ -63,13 +71,13 @@ namespace PhotoLabeler.ServiceLibrary.Implementations
 			data = ImageMetadataReader.ReadMetadata(file);
 
 			var photo = new Photo { Path = file };
-			data.Where(d => d.Name == "XMP").ToList().ForEach(xmpData =>
+			data.Where(d => d.Name == XmpDirName).ToList().ForEach(xmpData =>
 			{
 				AddLabelFromXmpDescription(labels, xmpData);
 				AddDatesFromXmpDir(xmpData, photo);
 			});
 
-			var exifDir = data.SingleOrDefault(i => i.Name == "Exif IFD0");
+			var exifDir = data.SingleOrDefault(i => i.Name == ExifDirName);
 			if (exifDir != null)
 			{
 				AddMetadataLabel(labels, exifDir, "Image Description");
@@ -80,6 +88,12 @@ namespace PhotoLabeler.ServiceLibrary.Implementations
 				{
 					AddDatesFromExifDir(exifDir, photo);
 				}
+			}
+
+			var exifSubDir = data.FirstOrDefault(d => d.Name == ExifSubDirName);
+			if (exifSubDir != null && !photo.TakenDate.HasValue)
+			{
+				AddDatesFromExifSubdir(photo, exifSubDir);
 			}
 
 			var ipcDir = data.SingleOrDefault(d => d.Name == "IPTC");
@@ -98,6 +112,11 @@ namespace PhotoLabeler.ServiceLibrary.Implementations
 				}
 			}
 
+			if (!photo.TakenDate.HasValue || !photo.ModifiedDate.HasValue)
+			{
+				AddDatesFromFile(file, photo);
+			}
+
 			labels = labels.Distinct().ToList();
 			if (labels.Any())
 			{
@@ -107,7 +126,38 @@ namespace PhotoLabeler.ServiceLibrary.Implementations
 			return photo;
 		}
 
-		private static void AddLabelFromQuickTimeDir(Directory quickTimeDir, List<string> labels)
+		private void AddDatesFromFile(string file, Photo photo)
+		{
+			var fileInfo = new System.IO.FileInfo(file);
+			if (!photo.TakenDate.HasValue)
+			{
+				photo.TakenDate = fileInfo.CreationTime;
+			}
+			if (!photo.ModifiedDate.HasValue)
+			{
+				photo.ModifiedDate = fileInfo.LastWriteTime;
+			}
+		}
+
+		private void AddDatesFromExifSubdir(Photo photo, Directory exifSubDir)
+		{
+			var tag = exifSubDir.Tags.SingleOrDefault(t => t.Name == ExifSubDateTimeTagName);
+			if (!string.IsNullOrWhiteSpace(tag?.Description))
+			{
+				photo.TakenDate = ParseDatetime(tag.Description);
+			}
+
+			if (!photo.TakenDate.HasValue)
+			{
+				tag = exifSubDir.Tags.SingleOrDefault(t => t.Name == ExifSubDateTimeDigitizedTagName);
+				if (!string.IsNullOrWhiteSpace(tag?.Description))
+				{
+					photo.TakenDate = ParseDatetime(tag.Description);
+				}
+			}
+		}
+
+		private void AddLabelFromQuickTimeDir(Directory quickTimeDir, List<string> labels)
 		{
 			var descriptionTag = quickTimeDir.Tags.SingleOrDefault(t => t.Name == QuickTimeMetadataDescriptionTag);
 			if (descriptionTag != null)
@@ -123,10 +173,7 @@ namespace PhotoLabeler.ServiceLibrary.Implementations
 			if (tag != null)
 			{
 				var tagValue = (StringValue)quickTimeMeta.GetObject(tag.Type);
-				if (DateTime.TryParse(tagValue.ToString(), out DateTime creationDate))
-				{
-					photo.TakenDate = creationDate;
-				}
+				photo.TakenDate = ParseDatetime(tagValue.ToString());
 			}
 		}
 
@@ -135,40 +182,29 @@ namespace PhotoLabeler.ServiceLibrary.Implementations
 			var tag = directory.Tags.SingleOrDefault(t => t.Name == ExifDateTimeTagName);
 			if (!string.IsNullOrWhiteSpace(tag?.Description))
 			{
-				if (DateTime.TryParseExact(tag.Description, ExifDateTimeFormat, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out DateTime creationDate))
-				{
-					photo.TakenDate = creationDate;
-				}
-				else if (DateTime.TryParseExact(tag.Description, ExifDateTimeFormat2, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out DateTime creationDate2))
-				{
-					photo.TakenDate = creationDate2;
-				}
+				photo.TakenDate = ParseDatetime(tag.Description);
 			}
 		}
 
 		private void AddDatesFromXmpDir(Directory xmpData, Photo photo)
 		{
-			var invariantCulture = CultureInfo.InvariantCulture;
 			var xmpDirectory = xmpData as XmpDirectory;
 			var dateCreated = xmpDirectory.XmpMeta.Properties.SingleOrDefault(p => p.Path == "xmp:CreateDate");
 			var photoshopDateCreated = xmpDirectory.XmpMeta.Properties.SingleOrDefault(p => p.Path == "photoshop:DateCreated");
 			var dateModified = xmpDirectory.XmpMeta.Properties.SingleOrDefault(p => p.Path == "xmp:ModifyDate");
-			if (!string.IsNullOrWhiteSpace(dateCreated?.Value)
-				&& DateTime.TryParseExact(dateCreated.Value, "s", invariantCulture, DateTimeStyles.RoundtripKind, out var takenDate))
+			if (!string.IsNullOrWhiteSpace(dateCreated?.Value))
 			{
-				photo.TakenDate = takenDate;
+				photo.TakenDate = ParseDatetime(dateCreated.Value);
 			}
 
-			if (!photo.TakenDate.HasValue && !string.IsNullOrWhiteSpace(photoshopDateCreated?.Value)
-				&& DateTime.TryParseExact(photoshopDateCreated.Value, "s", invariantCulture, DateTimeStyles.RoundtripKind, out var photoshopTakenDate))
+			if (!photo.TakenDate.HasValue && !string.IsNullOrWhiteSpace(photoshopDateCreated?.Value))
 			{
-				photo.TakenDate = photoshopTakenDate;
+				photo.TakenDate = ParseDatetime(photoshopDateCreated.Value);
 			}
 
-			if (!string.IsNullOrWhiteSpace(dateModified?.Value)
-				&& DateTime.TryParseExact(dateModified.Value, "s", invariantCulture, DateTimeStyles.RoundtripKind, out var modifiedDate))
+			if (!string.IsNullOrWhiteSpace(dateModified?.Value))
 			{
-				photo.ModifiedDate = modifiedDate;
+				photo.ModifiedDate = ParseDatetime(dateModified.Value);
 			}
 		}
 
@@ -236,6 +272,25 @@ namespace PhotoLabeler.ServiceLibrary.Implementations
 			var minutes = double.Parse(result.Groups["minutes"].Value, NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign | NumberStyles.AllowTrailingSign, _comaFormatInfo);
 			var seconds = double.Parse(result.Groups["seconds"].Value, NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign | NumberStyles.AllowTrailingSign, _comaFormatInfo);
 			return hours + (minutes / 60) + (seconds / 3600);
+		}
+
+		private DateTime? ParseDatetime(string dateTimeText)
+		{
+			DateTime dateTime;
+
+			if (DateTime.TryParseExact(dateTimeText, "s", CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out dateTime))
+			{
+				return dateTime;
+			}
+			if (DateTime.TryParseExact(dateTimeText, ExifDateTimeFormat, CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out dateTime))
+			{
+				return dateTime;
+			}
+			if (DateTime.TryParseExact(dateTimeText, ExifDateTimeFormat2, CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out dateTime))
+			{
+				return dateTime;
+			}
+			return null;
 		}
 	}
 }

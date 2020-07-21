@@ -139,7 +139,7 @@ namespace PhotoLabeler.ServiceLibrary.Implementations
 		{
 			var path = cell.Src;
 			if (string.IsNullOrEmpty(path)) return;
-			var img = await _photoReader.GetImgSrcAsync(path);			
+			var img = await _photoReader.GetImgSrcAsync(path);
 			cell.SrcBase64 = img;
 		}
 
@@ -196,9 +196,9 @@ namespace PhotoLabeler.ServiceLibrary.Implementations
 				{
 					Text = photo.Label,
 					Src = path,
-					SrcBase64 = img,					
+					SrcBase64 = img,
 				};
-				pictCell.ReloadImage = ()=>RedrawPicture(pictCell);
+				pictCell.ReloadImage = () => RedrawPicture(pictCell);
 				row.Cells.Add(pictCell);
 
 				//
