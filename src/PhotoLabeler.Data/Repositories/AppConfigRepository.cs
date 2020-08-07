@@ -10,15 +10,13 @@ using Dapper;
 using PhotoLabeler.Data.Repositories.Interfaces;
 using PhotoLabeler.Entities;
 
-namespace PhotoLabeler.Data.Interfaces.Repositories
+namespace PhotoLabeler.Data.Repositories
 {
 	/// <summary>
 	/// App config repository class
 	/// </summary>
-	public class AppConfigRepository : IAppConfigRepository
+	public class AppConfigRepository : RepositoryBase, IAppConfigRepository
 	{
-
-		private readonly IDbConnection _connection;
 
 		private const string TableName = "AppConfig";
 
@@ -27,13 +25,11 @@ namespace PhotoLabeler.Data.Interfaces.Repositories
 		/// </summary>
 		/// <param name="connection">The connection.</param>
 		public AppConfigRepository(IDbConnection connection)
+			: base(connection)
 		{
-			_connection = connection;
-			if (_connection.State != ConnectionState.Open)
-			{
-				_connection.Open();
-			}
-			CreateTableIfDoesNotExists();
+			CreateTableIfDoesNotExists(
+				TableName,
+				$"create table {TableName} (Key text not null primary key, Value text not null)");
 		}
 
 
@@ -78,7 +74,7 @@ namespace PhotoLabeler.Data.Interfaces.Repositories
 		/// Gets the application configs.
 		/// </summary>
 		/// <returns></returns>
-		public Task<IEnumerable<AppConfig>> GetAppConfigsAsync() => _connection.QueryAsync<AppConfig>($"select * from {TableName}");
+		public Task<IEnumerable<AppConfig>> GetAppConfigsAsync() => Connection.QueryAsync<AppConfig>($"select * from {TableName}");
 
 		/// <summary>
 		/// Refreshes the configuration asynchronous.
@@ -97,23 +93,11 @@ namespace PhotoLabeler.Data.Interfaces.Repositories
 		}
 
 
-		private void CreateTableIfDoesNotExists()
-		{
-			string query = "SELECT name FROM sqlite_master WHERE type='table' AND name=@tableName";
-			var parameters = new DynamicParameters();
-			parameters.Add("@tableName", TableName);
-			var rows = _connection.Query<string>(query, parameters);
-			if (!rows.Any())
-			{
-				_ = _connection.Execute($"create table {TableName} (Key text not null primary key, Value text not null)");
-			}
-		}
-
 		private async Task<AppConfig> GetAppConfigByKeyInternalAsync(string key)
 		{
 			var parameters = new DynamicParameters();
 			parameters.Add("@key", key);
-			return (await _connection.QueryAsync<AppConfig>($"select * from {TableName} where Key=@key", parameters)).SingleOrDefault();
+			return (await Connection.QueryAsync<AppConfig>($"select * from {TableName} where Key=@key", parameters)).SingleOrDefault();
 		}
 
 		private async Task<bool> SetEntryInternalAsync(string key, string value)
@@ -132,7 +116,7 @@ namespace PhotoLabeler.Data.Interfaces.Repositories
 			{
 				query = $"update {TableName} set value=@value where key=@key";
 			}
-			var affectedRows = await _connection.ExecuteAsync(query, parameters);
+			var affectedRows = await Connection.ExecuteAsync(query, parameters);
 			return affectedRows > 0;
 		}
 
@@ -166,7 +150,7 @@ namespace PhotoLabeler.Data.Interfaces.Repositories
 				paramOffset++;
 			}
 
-			_ = await _connection.ExecuteAsync(queryBuilder.ToString(), parameters);
+			_ = await Connection.ExecuteAsync(queryBuilder.ToString(), parameters);
 		}
 	}
 }

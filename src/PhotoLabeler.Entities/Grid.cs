@@ -35,6 +35,14 @@ namespace PhotoLabeler.Entities
 			public Grid Grid { get; set; }
 
 			public string Text { get; set; }
+
+			/// <summary>
+			/// Converts to string.
+			/// </summary>
+			/// <returns>
+			/// A <see cref="string" /> that represents this instance.
+			/// </returns>
+			public override string ToString() => Text ?? string.Empty;
 		}
 
 		public class GridHeaderCell : GridCell
@@ -48,9 +56,9 @@ namespace PhotoLabeler.Entities
 				= Order.Default;
 		}
 
-		public class GridCellLabel : GridCell
+		public class GridLabelCell : GridCell
 		{
-			public GridCellLabel(int cellIndex, GridRow row, Grid grid)
+			public GridLabelCell(int cellIndex, GridRow row, Grid grid)
 				: base(cellIndex, row, grid)
 			{
 			}
@@ -58,9 +66,9 @@ namespace PhotoLabeler.Entities
 			public bool HasLabel { get; set; }
 		}
 
-		public class GridCellLink : GridCell
+		public class GridLinkCell : GridCell
 		{
-			public GridCellLink(int cellIndex, GridRow row, Grid grid)
+			public GridLinkCell(int cellIndex, GridRow row, Grid grid)
 				: base(cellIndex, row, grid)
 			{
 			}
@@ -68,25 +76,25 @@ namespace PhotoLabeler.Entities
 			public string Link { get; set; }
 		}
 
-		public class GridCellFileName : GridCell
+		public class GridFileNameCell : GridCell
 		{
-			public GridCellFileName(int cellIndex, GridRow row, Grid grid)
+			public GridFileNameCell(int cellIndex, GridRow row, Grid grid)
 				: base(cellIndex, row, grid)
 			{
 			}
 		}
 
-		public class GridCellTakenData : GridCell
+		public class GridTakenDataCell : GridCell
 		{
-			public GridCellTakenData(int cellIndex, GridRow row, Grid grid
+			public GridTakenDataCell(int cellIndex, GridRow row, Grid grid
 				) : base(cellIndex, row, grid)
 			{
 			}
 		}
 
-		public class GridCellPict : GridCell
+		public class GridPictCell : GridCell
 		{
-			public GridCellPict(int cellIndex, GridRow row, Grid grid)
+			public GridPictCell(int cellIndex, GridRow row, Grid grid)
 				: base(cellIndex, row, grid)
 			{
 			}
@@ -95,6 +103,23 @@ namespace PhotoLabeler.Entities
 
 			public string SrcBase64 { get; set; }
 			public Func<Task> ReloadImage { get; set; } = null;
+		}
+
+		public class GridLocationCell : GridCell
+		{
+			public GridLocationCell(int cellIndex, GridRow row, Grid grid)
+				: base(cellIndex, row, grid)
+			{
+			}
+
+			public double? Latitude { get; set; }
+
+			public double? Longitude { get; set; }
+
+			public bool LocationLoaded { get; set; }
+
+			public Func<GridLocationCell, Task> LoadLocation { get; set; }
+
 		}
 
 		public class GridRow
@@ -128,12 +153,98 @@ namespace PhotoLabeler.Entities
 			public List<GridRow> Rows { get; set; } = new List<GridRow>();
 		}
 
+		/// <summary>
+		/// Gets or sets the caption.
+		/// </summary>
+		/// <value>
+		/// The caption.
+		/// </value>
 		public string Caption { get; set; }
 
+		/// <summary>
+		/// Gets or sets the header.
+		/// </summary>
+		/// <value>
+		/// The header.
+		/// </value>
 		public GridHeader Header { get; set; }
 
+		/// <summary>
+		/// Gets or sets the body.
+		/// </summary>
+		/// <value>
+		/// The body.
+		/// </value>
 		public GridBody Body { get; set; }
 
+		private bool _selectedCellInitialized = false;
+		private GridCell _selectedCell;
+
+		/// <summary>
+		/// Gets the selected cell.
+		/// </summary>
+		/// <value>
+		/// The selected cell.
+		/// </value>
+		public GridCell SelectedCell
+		{
+			get
+			{
+				if (!_selectedCellInitialized)
+				{
+					var allRows = Body?.Rows;
+					if (allRows is null)
+					{
+						return null;
+					}
+					var selectedCell = allRows.SelectMany(r => r.Cells).SingleOrDefault(c => c.Selected);
+					if (selectedCell != null)
+					{
+						_selectedCellInitialized = true;
+						_selectedCell = selectedCell;
+						return _selectedCell;
+					}
+					return null;
+				}
+				return _selectedCell;
+			}
+			set
+			{
+				_selectedCellInitialized = true;
+				_selectedCell = value;
+			}
+		}
+
+		/// <summary>
+		/// Gets or sets the previous selected cell.
+		/// </summary>
+		/// <value>
+		/// The previous selected cell.
+		/// </value>
+		public GridCell PreviousSelectedCell { get; set; }
+
+		/// <summary>
+		/// Gets or sets the errors produced while generating the grid.
+		/// </summary>
+		/// <value>
+		/// The errors.
+		/// </value>
+		public AggregateException Errors { get; set; }
+
+		/// <summary>
+		/// Gets a value indicating whether this instance has errors.
+		/// </summary>
+		/// <value>
+		///   <c>true</c> if this instance has errors; otherwise, <c>false</c>.
+		/// </value>
+		public bool HasErrors => Errors != null;
+
+		/// <summary>
+		/// Gets all grid rows.
+		/// </summary>
+		/// <value>
+		/// All rows.
+		/// </value>
 		public List<GridRow> AllRows
 		{
 			get

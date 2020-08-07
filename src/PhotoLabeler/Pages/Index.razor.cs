@@ -2,6 +2,7 @@
 
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using ElectronNET.API;
@@ -24,6 +25,8 @@ namespace PhotoLabeler.Pages
 
 		private Components.Grid _gridRef = null;
 
+		private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+
 		protected override async Task OnInitializedAsync()
 		{
 			menuService.MnuFileOpenFolderClick += SelectDirectory;
@@ -38,12 +41,12 @@ namespace PhotoLabeler.Pages
 		private async Task SelectLanguage(LanguageEventArgs e)
 		{
 			await appConfigRepository.SetEntryAsync(Constants.ConfigConstants.LanguageConfigKey, e.CultureName);
+			_cancellationTokenSource.Cancel();
 			navigationManager.NavigateTo($"/Language/?cultureName={HttpUtility.UrlEncode(e.CultureName)}&redirectUri=%2F", true);
 		}
 
 		private async Task SelectDirectory()
 		{
-
 			try
 			{
 				var mainWindow = Electron.WindowManager.BrowserWindows.First();
@@ -58,8 +61,19 @@ namespace PhotoLabeler.Pages
 				if (files.Length > 0)
 				{
 					_selectedFile = files[0];
+					_cancellationTokenSource.Cancel();
+					_cancellationTokenSource = new CancellationTokenSource();
 					_statusText = localizer["Loading directories..."];
-					_treeViewItems = await photoLabelerService.GetPhotosFromDirAsync(_selectedFile);
+					try
+					{
+						_treeViewItems = await photoLabelerService.GetTreeViewFromDirAsync(_selectedFile, false, _cancellationTokenSource.Token);
+					}
+					catch (TaskCanceledException)
+					{
+						logger.Debug("The task to load all directories of a specified path has been canceled.");
+						_statusText = localizer["Operation canceled."];
+						return;
+					}
 					_statusText = localizer["Directories loaded"];
 					QuerySelectorToFocusAfterRendering = "#treeViewPhotos [tabindex=\"0\"]";
 				}
@@ -76,6 +90,7 @@ namespace PhotoLabeler.Pages
 
 		private void ExitApp()
 		{
+			_cancellationTokenSource.Cancel();
 			Electron.App.Quit();
 		}
 
@@ -85,21 +100,46 @@ namespace PhotoLabeler.Pages
 			{
 				// clear previous data
 				_gridRef?.Cancel();
+				_cancellationTokenSource.Cancel();
 				_gridData = null;
 				StateHasChanged();
-				await Task.Delay(1);
+				_cancellationTokenSource = new CancellationTokenSource();
+				await Task.Delay(1, _cancellationTokenSource.Token);
 
 				// new data
-				_gridData = await photoLabelerService.GetGridFromTreeViewItemAsync(item);
+				_gridData = await photoLabelerService.GetGridFromTreeViewItemAsync(item, _cancellationTokenSource.Token);
+				if (_gridData.HasErrors)
+				{
+					var errorsCount = _gridData.Errors.InnerExceptions.Count();
+					var photosLoadedSuccessfully = _gridData.AllRows.Count() - errorsCount;
+					await CreateErrorDialogAsync(
+						title: localizer["Error loading some photos."],
+						text: localizer["There were {0} errors while loading the photos. {1} photos were loaded correctly.", errorsCount, photosLoadedSuccessfully]
+						);
+				}
+			}
+			catch (TaskCanceledException)
+			{
+				logger.Debug("The task to retrieve all photos from a directory has been canceled.");
 			}
 			catch (Exception ex)
 			{
-				var options = new MessageBoxOptions(localizer["Error getting the photos from the directory: {0}.", ex.Message])
-				{
-					Type = MessageBoxType.error
-				};
-				_ = await Electron.Dialog.ShowMessageBoxAsync(options);
+				logger.Error(ex, "Error when retrieving photo list.");
+				await CreateErrorDialogAsync(
+					title: localizer["Error while getting the photos."],
+					text: localizer["Error getting the photos from the directory: {0}.", ex.Message]
+					);
 			}
+		}
+
+		private Task CreateErrorDialogAsync(string title, string text)
+		{
+			var options = new MessageBoxOptions(text)
+			{
+				Type = MessageBoxType.error,
+				Title = title,
+			};
+			return Electron.Dialog.ShowMessageBoxAsync(options);
 		}
 
 		private void CheckPhotoFilter(ChangeEventArgs e)
@@ -110,7 +150,7 @@ namespace PhotoLabeler.Pages
 				{
 					_gridData.Body.Rows.ForEach(r =>
 					{
-						var labelCell = r.Cells.Single(c => c is Grid.GridCellLabel) as Grid.GridCellLabel;
+						var labelCell = r.Cells.Single(c => c is Grid.GridLabelCell) as Grid.GridLabelCell;
 						if (!labelCell.HasLabel)
 						{
 							r.Visible = false;

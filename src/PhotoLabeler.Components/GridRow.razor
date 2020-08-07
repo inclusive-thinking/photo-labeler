@@ -4,13 +4,13 @@
 		@if (cell is Entities.Grid.GridHeaderCell headerCell)
 		{
 			<GridRowTh HeaderCell=headerCell>
-				<GridRowCellContent Cell=headerCell RefreshGrid="RefreshGrid" />
+				<GridRowCellContent Cell=headerCell />
 			</GridRowTh>
 		}
 		else
 		{
 			<td>
-				<GridRowCellContent Cell=cell RefreshGrid="RefreshGrid" />
+				<GridRowCellContent Cell=cell />
 			</td>
 		}
 	}

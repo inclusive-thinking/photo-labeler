@@ -9,6 +9,8 @@
     <PackageReference Include="Moq" Version="4.14.5" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\PhotoLabeler.Data\PhotoLabeler.Data.csproj" />
+    <ProjectReference Include="..\PhotoLabeler.Nominatim.Agent\PhotoLabeler.Nominatim.Agent.csproj" />
     <ProjectReference Include="..\PhotoLabeler.ServiceLibrary\PhotoLabeler.ServiceLibrary.csproj" />
   </ItemGroup>
 </Project>

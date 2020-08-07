@@ -14,6 +14,7 @@
     <ProjectReference Include="..\PhotoLabeler.Components\PhotoLabeler.Components.csproj" />
     <ProjectReference Include="..\PhotoLabeler.Data\PhotoLabeler.Data.csproj" />
     <ProjectReference Include="..\PhotoLabeler.Entities\PhotoLabeler.Entities.csproj" />
+    <ProjectReference Include="..\PhotoLabeler.Nominatim.Agent\PhotoLabeler.Nominatim.Agent.csproj" />
     <ProjectReference Include="..\PhotoLabeler.ServiceLibrary\PhotoLabeler.ServiceLibrary.csproj" />
     <ProjectReference Include="..\PhotoLabeler.PhotoStorageReader\PhotoLabeler.PhotoStorageReader.csproj" />
   </ItemGroup>

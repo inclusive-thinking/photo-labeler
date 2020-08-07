@@ -1,6 +1,7 @@
 // Copyright (c) Juanjo Montiel and contributors. All Rights Reserved. Licensed under the GNU General Public License, Version 2.0. See LICENSE in the project root for license information.
 
 using System.Data;
+using System.Net.Http;
 using System.Threading.Tasks;
 using ElectronNET.API;
 using Microsoft.AspNetCore.Builder;
@@ -10,9 +11,14 @@ using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using PhotoLabeler.Data.Interfaces.Repositories;
+using PhotoLabeler.Croscutting.Implementations;
+using PhotoLabeler.Croscutting.Interfaces;
+using PhotoLabeler.Data.Interfaces;
+using PhotoLabeler.Data.Repositories;
 using PhotoLabeler.Data.Repositories.Interfaces;
 using PhotoLabeler.Interfaces;
+using PhotoLabeler.Nominatim.Agent;
+using PhotoLabeler.Nominatim.Agent.Entities;
 using PhotoLabeler.PhotoStorageReader.Implementations;
 using PhotoLabeler.PhotoStorageReader.Interfaces;
 using PhotoLabeler.ServiceLibrary.Implementations;
@@ -54,10 +60,18 @@ namespace PhotoLabeler
 			{
 				options.ResourcesPath = "Resources";
 			});
+			services.AddHttpClient();
+			services.AddTransient(typeof(HttpClient), (serviceProvider) =>
+			{
+				return serviceProvider.GetService< IHttpClientFactory>().CreateClient();
+			});
+
 			services.AddSingleton<IPhotoLabelerService, PhotoLabelerService>();
 			services.AddSingleton<IPhotoInfoService, PhotoInfoService>();
 			services.AddSingleton<IPhotoReader, PhotoReaderBase64>();
+			services.AddSingleton<INominatimAgent, NominatimAgent>();
 			services.AddSingleton<IMenuService, MenuService>();
+			services.AddSingleton<ICryptoService, CryptoService>();
 			services.AddSingleton<IDbConnection>((serviceProvider) =>
 			{
 				var connectionStringBuilder = new SqliteConnectionStringBuilder { DataSource = "./appconfig.db" };
@@ -65,6 +79,15 @@ namespace PhotoLabeler
 				return connection;
 			});
 			services.AddSingleton<IAppConfigRepository, AppConfigRepository>();
+			services.AddSingleton<IPhotoRepository, PhotoRepository>();
+
+			services.AddSingleton(typeof(NominatimAgentConfig), (provider) =>
+			{
+				var cf = new NominatimAgentConfig();
+				Configuration.GetSection("Nominatim").Bind(cf);
+				return cf;
+			});
+
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -15,11 +15,11 @@ namespace PhotoLabeler.PhotoStorageReader.Implementations
 	{
 		public async Task<string> GetImgSrcAsync(string path)
 		{
-			var result = await Task.FromResult( this.GetImgSrc(path) );
+			var result = await Task.FromResult(GetImgSrc(path));
 			return result;
 		}
 
-		public string GetPictureImageSrc() => PhotoReaderBase64thumbnails.B64ImageThumbnail;
+		public string GetGenericImageSrc() => PhotoReaderBase64thumbnails.B64ImageThumbnail;
 		public string GetImgSrc(string path)
 		{
 			const int uiSize = 100;

@@ -6,71 +6,15 @@
 		<p>@GetText()</p>
 	</div>
 }
-else
+else if (Type == AlertType.Assertive || Type == AlertType.Polite)
 {
-	<div aria-live="@(this.Type == AlertType.Alert ? "assertive" : "polite")">
+	<div aria-live="@(this.Type == AlertType.Assertive ? "assertive" : "polite")">
 		<p>@GetText()</p>
 	</div>
 }
-
-@code
+else
 {
-
-	public enum AlertType
-	{
-		Alert,
-		Assertive,
-		Polite
-	}
-
-	[Parameter]
-	public string Text { get; set; }
-
-	[Parameter]
-	public AlertType Type { get; set; } = AlertType.Assertive;
-
-	private bool textRemoved = false;
-
-	private Timer timer;
-	private bool beforeFirstRender = true;
-
-	private string GetText()
-	{
-		if (textRemoved || beforeFirstRender)
-		{
-			return string.Empty;
-		}
-		return Text;
-	}
-
-	protected override async Task OnInitializedAsync()
-	{
-		await base.OnInitializedAsync();
-		timer = new Timer();
-		timer.Interval = 300;
-		timer.Elapsed += async (sender, e) =>
-		{
-			textRemoved = true;
-			timer.Stop();
-			await InvokeAsync(() => { StateHasChanged(); });
-		};
-	}
-
-	protected override async Task OnParametersSetAsync()
-	{
-		await base.OnParametersSetAsync();
-		textRemoved = false;
-		// timer.Start();
-	}
-
-	protected override async Task OnAfterRenderAsync(bool firstRender)
-	{
-		await base.OnAfterRenderAsync(firstRender);
-		if (firstRender)
-		{
-			beforeFirstRender = false;
-			await Task.Delay(100);
-			StateHasChanged();
-		}
-	}
+	<div role="status" class="sr-only"><p>@GetText()</p></div>
 }
+
+

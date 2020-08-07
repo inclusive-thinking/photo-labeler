@@ -1,87 +1,34 @@
 ﻿@using PhotoLabeler.Components.Extensions;
 @using Microsoft.AspNetCore.Components.Web;
+@inject Serilog.ILogger Logger;
 
-@if (Cell is PhotoLabeler.Entities.Grid.GridCellLink link)
+@if (Cell is PhotoLabeler.Entities.Grid.GridLinkCell link)
 {
-	<a href="@link.Link"
-	   @onkeydown="@( (KeyboardEventArgs e) => Item_KeyDown(e) )"
-	   tabindex="@( Cell.Selected?"0":"-1")">
+	<a class="@(Cell.Selected ? "focused" : null)" href="@link.Link">
 		@Cell.Text
 	</a>
 }
-else if (Cell is PhotoLabeler.Entities.Grid.GridCellPict cellPict)
+else if (Cell is PhotoLabeler.Entities.Grid.GridPictCell cellPict)
 {
-	<img @onkeydown="@( (KeyboardEventArgs e) => Item_KeyDown(e) )"
-		 tabindex="@( cellPict.Selected?"0":"-1")"
+	<img class="@(cellPict.Selected ? "focused" : null)"
 		 src="@cellPict.SrcBase64"
 		 alt="@(String.IsNullOrWhiteSpace(cellPict.Text) ? cellPict.Src: cellPict.Text)"
 		 style="width: 100px; height: 100px; border-radius: 4px;" />
 }
 else
 {
-	<span @onkeydown="@( (KeyboardEventArgs e) => Item_KeyDown(e) )"
-		  tabindex="@( Cell.Selected?"0":"-1")">
+	<span class="@(Cell.Selected ? "focused" : null)">
 		@Cell.Text
 	</span>
 }
 
 @code
 {
+
 	[Parameter] public Entities.Grid.GridCell Cell { get; set; }
 	[Parameter] public RenderFragment fragment { get; set; }
-	[Parameter] public Action<bool> RefreshGrid { get; set; }
 
-	private void Item_KeyDown(KeyboardEventArgs e)
-	{
-		var focus = false;
-		Entities.Grid.GridCell newSelectedCell = null;
-
-		switch (e.Key)
-		{
-			case "ArrowLeft":
-				if (Cell.CellIndex == 0)
-				{
-					return;
-				}
-				newSelectedCell = Cell.Row.Cells[Cell.CellIndex - 1];
-				break;
-			case "ArrowRight":
-				if (Cell.CellIndex == Cell.Row.Cells.Count - 1)
-				{
-					return;
-				}
-				newSelectedCell = Cell.Row.Cells[Cell.CellIndex + 1];
-				break;
-			case "ArrowUp":
-				var previousRow = Cell.Row.GetPreviousRow();
-				if (previousRow == null)
-				{
-					return;
-				}
-				newSelectedCell = previousRow.Cells[Cell.CellIndex];
-				break;
-			case "ArrowDown":
-				var nextRow = Cell.Row.GetNextRow();
-				if (nextRow == null)
-				{
-					return;
-				}
-				newSelectedCell = nextRow.Cells[Cell.CellIndex];
-				break;
-			default:
-				break;
-		}
-
-		if (newSelectedCell != null)
-		{
-			Cell.Selected = false;
-			newSelectedCell.Selected = true;
-		}
-		focus = newSelectedCell != null;
-		RefreshGrid(focus);
-
-	}
-
+	
 }
 
 

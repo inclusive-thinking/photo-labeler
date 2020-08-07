@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Juanjo Montiel and contributors. All Rights Reserved. Licensed under the GNU General Public License, Version 2.0. See LICENSE in the project root for license information.
 
 using System;
+using System.Collections.Generic;
 
 namespace PhotoLabeler.Entities
 {
@@ -67,20 +68,36 @@ namespace PhotoLabeler.Entities
 		public double? AltitudeInMeters { get; set; }
 
 		/// <summary>
-		/// Gets or sets the location desc.
-		/// </summary>
-		/// <value>
-		/// The location desc.
-		/// </value>
-		public string LocationDesc { get; set; }
-
-		/// <summary>
 		/// Gets or sets the MD5 sum.
 		/// </summary>
 		/// <value>
 		/// The MD5 sum.
 		/// </value>
 		public string Md5Sum { get; set; }
+
+		/// <summary>
+		/// Gets or sets the localization information.
+		/// </summary>
+		/// <value>
+		/// The localization information.
+		/// </value>
+		public List<PhotoLocalizedInfo> LocalizedInfo { get; set; } = new List<PhotoLocalizedInfo>();
+
+		/// <summary>
+		/// Gets or sets the error associated to this entity retrieval.
+		/// </summary>
+		/// <value>
+		/// The error.
+		/// </value>
+		public Exception Error { get; set; }
+
+		/// <summary>
+		/// Gets a value indicating whether this instance has errors.
+		/// </summary>
+		/// <value>
+		///   <c>true</c> if this instance has errors; otherwise, <c>false</c>.
+		/// </value>
+		public bool HasErrors => Error != null;
 
 	}
 }
