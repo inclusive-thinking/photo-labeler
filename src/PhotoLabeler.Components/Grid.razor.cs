@@ -322,7 +322,6 @@ namespace PhotoLabeler.Components
 					return;
 				}
 				await vi.Reference.ReloadLocation();
-				await Task.Delay(1000);
 			}
 		}
 

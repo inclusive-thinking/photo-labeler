@@ -357,6 +357,7 @@ namespace PhotoLabeler.ServiceLibrary.Implementations
 						await _photoRepository.EditPhotoAsync(photo);
 					}
 				}
+				await Task.Delay(1000);
 			}
 			catch (Exception ex)
 			{
