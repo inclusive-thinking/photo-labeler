@@ -37,21 +37,28 @@ Una vez instalado y configurado el entorno de desarrollo, necesitarás instalar 
 2. Inicia sesión en Github con tu usuario, si aún no lo has hecho.
 3. Pulsa en el botón "Fork" para crear una copia del repositorio bajo tu propio usuario.
 4. Una vez hecho el fork, clona el repositorio que acabas de crear:
-```bash
-git clone https://github.com/tu_usuario/photo-labeler
-```
+
+    ```bash
+    git clone https://github.com/tu_usuario/photo-labeler
+    ```
 5. Entra al repositorio
-```bash
-cd photo-labeler
-```
+
+    ```bash
+    cd photo-labeler
+    ```
+
 6. photo-labeler depende de una librería de terceros llamada metadata-extractor-dotnet. Esta librería está añadida como submódulo, por lo que tendrémos que inicializarlo:
-```bash
-git submodule update --init --recursive
-```
+
+    ```bash
+    git submodule update --init --recursive
+    ```
+
 7. Accede al directorio src/PhotoLabeler, y en la terminal, ejecuta el comando:
-```bash
-electronize start
-```
+
+    ```bash
+    electronize start
+    ```
+
 8. Tras unos segundos, debería abrirse la ventana de la aplicación y podrás empezar a utilizarla. Si deseas depurar la aplicación utilizando Visual Studio o Visual Studio Code, adjúntate al proceso "PhotoLabeler" que deberá aparecer en la lista de procesos. Aquí tienes un artículo sobre cómo [depurar aplicaciones .Net Core con Visual Studio Code](https://medium.com/@mikezrimsek/debugging-dotnet-core-projects-with-visual-studio-code-ff0ab66ecc70).
 
 ### ¿Cómo contribuir?
@@ -60,10 +67,12 @@ Lo más fácil es que vayas a la página de [issues del proyecto](https://github
 1. accede a la issue y mira el número que tiene asignado (está en la cabecera, en el título y al final de la URL).
 2. Sincroniza la rama develop de tu repositorio con la rama develop del repositorio padre (el de inclusive-thinking/photo labeler). [Aquí tienes una guía de cómo hacerlo](https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests/syncing-a-fork).
 3. Crea una rama basada en la recién sincronizada rama develop llamada feature/[issue_number]-proposito-muy-corto-separado-por-guiones. Por ejemplo: "feature/47-add-focus-indicator".
-```bash
-git checkout -b feature/47-add-focus-indicator
-```
-Si es un bug, en lugar de feature, antepón el nombre de la rama con el prefijo "bugfix": bugfix/48-fix-typo-in-main-menu.
+
+    ```bash
+    git checkout -b feature/47-add-focus-indicator
+    ```
+    
+    Si es un bug, en lugar de feature, antepón el nombre de la rama con el prefijo "bugfix": bugfix/48-fix-typo-in-main-menu.
 4. Añade un comentario en la issue, indicando que estás trabajando en ella. Si ya has subido tu nueva rama a tu repositorio remoto, sería interesante que añadieras el enlace a esa rama, por si alguien quiere ir revisando el progreso del trabajo.
 5. Trabaja en tu rama. Si tu trabajo dura algunos días, sería bueno que volvieses a sincronizar la rama de develop con los últimos cambios del repositorio padre, e hicieses un merge de la rama develop actualizada a tu rama. Mientras más actualizada esté la rama con la que trabajas con la rama de develop del repositorio padre, menos conflictos habrá cuando crees la "pull request" para integrar tus cambios.
 6. En la sección de navegación de tu repositorio, haz click en "Pull requests" y a continuación, en "Create pull request".

@@ -42,30 +42,42 @@ Once the development environment is installed and configured, you will need to i
 3. Click on the "Fork" button to create a copy of the repository under your own user.
 4. Once the fork is done, clone the repository you just created:
 
-```bash
-git clone https://github.com/your_user/photo-labeler
-```
+    ```bash
+    git clone https://github.com/your_user/photo-labeler 
+    ```
 
-5. Enter the repository
-```bash
-cd photo-labeler
- ```
+5. Enter the repository 
+
+    ```bash
+    cd photo-labeler
+    ```
+
 6. photo-labeler depends on a third party library called metadata-extractor-dotnet. This library is added as a sub-module, so we will have to initialize it:
-```bash
-git submodule update --init --recursive
-```
+
+    ```bash
+    git submodule update --init --recursive
+    ```
+
 7. Access the src/PhotoLabeler directory, and in the terminal, execute the command:
-```bash
-electronize start
-```
+
+    ```bash
+    electronize start
+    ```
+
 8. After a few seconds, the application window should open and you can start using it. If you want to debug the application using Visual Studio or Visual Studio Code, join the "PhotoLabeler" process that should appear in the process list. Here is an article about debugging .Net Core applications with Visual Studio Code (https://medium.com/@mikezrimsek/debugging-dotnet-core-projects-with-visual-studio-code-ff0ab66ecc70).
 
 ### How to contribute?
 
-The easiest way is to go to the [project issues] page (https://github.com/inclusive-thinking/photo-labeler/issues). There, you can see the open issues and contribute to any of them that nobody is working on yet. You can also create your own issue if you find a bug or propose a new feature. In the latter two cases, it would be wise to wait for a member of the project to confirm that the bug exists, or that the feature you want to add is consistent with the project.
+The easiest way is to go to the [project issues page](https://github.com/inclusive-thinking/photo-labeler/issues). There, you can see the open issues and contribute to any of them that nobody is working on yet. You can also create your own issue if you find a bug or propose a new feature. In the latter two cases, it would be wise to wait for a member of the project to confirm that the bug exists, or that the feature you want to add is consistent with the project.
 1. Go to the issue and look at the number assigned to it (it's in the header, in the title and at the end of the URL).
-2. Synchronize the develop branch of your repository with the develop branch of the parent repository (the one in inclusive-thinking/photo labeler). (Here's a guide on how to do this) (https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests/syncing-a-fork).
-3. Create a branch based on the newly synchronized develop branch called feature/[issue_number]-goal-very-short-scripted. For example: "feature/47-add-focus-indicator" ( `git checkout -b feature/47-add-focus-indicator`) If it's a bug, instead of a feature, prefix the name of the branch with "bugfix": bugfix/48-fix-typo-in-main-menu.
+2. Synchronize the develop branch of your repository with the develop branch of the parent repository (the one in inclusive-thinking/photo labeler). [Here's a guide on how to do this](https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests/syncing-a-fork).
+3. Create a branch based on the newly synchronized develop branch called feature/[issue_number]-goal-very-short-scripted. For example: "feature/47-add-focus-indicator":
+
+    ```bash
+    git checkout -b feature/47-add-focus-indicator
+    ```
+
+    If it's a bug, instead of a feature, prefix the name of the branch with "bugfix": bugfix/48-fix-typo-in-main-menu.
 4. Add a comment to the issue, indicating that you are working on it. If you have already uploaded your new branch to your remote repository, it would be interesting to add the link to that branch, in case someone wants to check the progress of the work.
 5. Work on your branch. If your work takes a few days, it would be good to resynchronize the develop branch with the latest changes in the parent repository, and merge the updated develop branch into your branch. The more up-to-date the branch you are working on is with the develop branch from the parent repository, the fewer conflicts there will be when you create the pull request to integrate your changes.
 6. In the navigation section of your repository, click on "Pull requests" and then "Create pull request".
