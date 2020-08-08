@@ -42,9 +42,9 @@ Once the development environment is installed and configured, you will need to i
 git clone https://github.com/your_user/photo-labeler
 ```
 5. Enter the repository
-``bash
+ ``bash
 cd photo-labeler
-```
+ ```
 6. photo-labeler depends on a third party library called metadata-extractor-dotnet. This library is added as a sub-module, so we will have to initialize it:
 ``bash
 git submodule update --init --recursive
@@ -61,10 +61,10 @@ The easiest way is to go to the [project issues] page (https://github.com/inclus
 1. Go to the issue and look at the number assigned to it (it's in the header, in the title and at the end of the URL).
 2. Synchronize the develop branch of your repository with the develop branch of the parent repository (the one in inclusive-thinking/photo labeler). (Here's a guide on how to do this) (https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests/syncing-a-fork).
 3. Create a branch based on the newly synchronized develop branch called feature/[issue_number]-goal-very-short-scripted. For example: "feature/47-add-focus-indicator".
-``bash
+ ``bash
 git checkout -b feature/47-add-focus-indicator
-```
-If it's a bug, instead of a feature, prefix the name of the branch with "bugfix": bugfix/48-fix-typo-in-main-menu.
+ ```
+ If it's a bug, instead of a feature, prefix the name of the branch with "bugfix": bugfix/48-fix-typo-in-main-menu.
 4. Add a comment to the issue, indicating that you are working on it. If you have already uploaded your new branch to your remote repository, it would be interesting to add the link to that branch, in case someone wants to check the progress of the work.
 5. Work on your branch. If your work takes a few days, it would be good to resynchronize the develop branch with the latest changes in the parent repository, and merge the updated develop branch into your branch. The more up-to-date the branch you are working on is with the develop branch from the parent repository, the fewer conflicts there will be when you create the pull request to integrate your changes.
 6. In the navigation section of your repository, click on "Pull requests" and then "Create pull request".
@@ -72,8 +72,7 @@ If it's a bug, instead of a feature, prefix the name of the branch with "bugfix"
 8. Click on the "Create pull requests" button, and fill in the fields as requested.
 9. In the description, link your PR to the issue you were working on. [Here is a guide to linking issues with pull requests](https://docs.github.com/en/enterprise/2.17/user/github/managing-your-work-on-github/linking-a-pull-request-to-an-issue). For example: Fixes inclusive-thinking/photo-labeler#47
 10. Once you have finished filling in the fields, complete the creation of the pull request. You will be notified by mail of the changes, including the reviewers' comments on it.
-11. Once your PR is approved and completed, your changes will be available in the develop branch and the linked issue will be closed automatically. Good work! :)
-
+11. Once your PR is approved and completed, your changes will be available in the develop branch and the linked issue will be closed automatically. Good work!
 
 ## How it works
 
