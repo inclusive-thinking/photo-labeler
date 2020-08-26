@@ -158,10 +158,10 @@ namespace PhotoLabeler.Components
 				if (newSelectedReference?.Reference != null && newSelectedReference != selectedReference)
 				{
 					await newSelectedReference.Reference.NotifyShouldRender();
+					await newSelectedReference.Reference.ScrollIntoRow();
 				}
 				_accessibleAlertRef.Text = GetAriaText();
-				_accessibleAlertRef.NotifyShouldRender();
-				// await _accessibleAlertRef.NotifyShouldRender();
+				await _accessibleAlertRef.NotifyShouldRender();
 			}
 		}
 		private string GetAriaText(bool readAllInformation = false)

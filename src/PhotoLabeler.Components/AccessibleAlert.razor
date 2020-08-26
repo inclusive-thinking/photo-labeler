@@ -2,19 +2,19 @@
 
 @if (this.Type == AlertType.Alert)
 {
-	<div role="alert">
+	<div role="alert" class="sr-only">
 		<p>@GetText()</p>
 	</div>
 }
 else if (Type == AlertType.Assertive || Type == AlertType.Polite)
 {
-	<div aria-live="@(this.Type == AlertType.Assertive ? "assertive" : "polite")">
+	<div aria-live="@(this.Type == AlertType.Assertive ? "assertive" : "polite")" class="sr-only">
 		<p>@GetText()</p>
 	</div>
 }
 else
 {
-	<div role="status" class="sr-only"><p>@GetText()</p></div>
+	<div role="status" class="sr-only"><p>@GetText()</p></div class=sr-only">
 }
 
 
