@@ -1,22 +1,22 @@
 ﻿@using Microsoft.AspNetCore.Components.Web
-<div class="main-grid"  @onkeydown="OnKeyDown" tabindex="0" aria-label="@(Localizer[(!string.IsNullOrEmpty(Model.Caption) ? "{0}. " : string.Empty) + "{1}", Model.Caption, GetAriaText(true)])">
+<div class="main-grid"  @onkeydown="OnKeyDown" tabindex="0" aria-labelledby="@($"{Id}_gridCaption")" @onfocus="OnFocus">
 	<table id="@Id">
 		@if (!string.IsNullOrWhiteSpace(Model.Caption))
 		{
-			<caption>@Model.Caption</caption>
+			<caption id="@($"{Id}_gridCaption")">@Model.Caption</caption>
 		}
 		<thead>
 			<GridRow Row="@Model.Header.Row" />
 		</thead>
 		<tbody>
-			@foreach (var visibleItem in _visibleItems)
+			@foreach (var item in _renderedItems)
 			{
-				var _visibleItem = visibleItem;
-				<GridRow Row="@_visibleItem.Item" @ref="@_visibleItem.Reference" />
+				Logger.Debug($"Rendering row {item.Model.PicturePath}...");
+				<GridRow Row="@item.Model" @ref="@item.ComponentRef" />
 			}
 		</tbody>
 	</table>
-	<AccessibleAlert @ref="_accessibleAlertRef" Type="AccessibleAlert.AlertType.Status" Text="@GetAriaText()"></AccessibleAlert>
+	<AccessibleAlert Type="AccessibleAlert.AlertType.Status" @ref="_accessibleAlertRef"></AccessibleAlert>
 </div>
 
 <style>

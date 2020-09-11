@@ -65,7 +65,7 @@ namespace PhotoLabeler
 			{
 				return serviceProvider.GetService< IHttpClientFactory>().CreateClient();
 			});
-
+			services.AddSingleton<IDebugService, DebugService>();
 			services.AddSingleton<IPhotoLabelerService, PhotoLabelerService>();
 			services.AddSingleton<IPhotoInfoService, PhotoInfoService>();
 			services.AddSingleton<IPhotoReader, PhotoReaderBase64>();
@@ -74,12 +74,12 @@ namespace PhotoLabeler
 			services.AddSingleton<ICryptoService, CryptoService>();
 			services.AddSingleton<IDbConnection>((serviceProvider) =>
 			{
-				var connectionStringBuilder = new SqliteConnectionStringBuilder { DataSource = "./appconfig.db" };
+				var connectionStringBuilder = new SqliteConnectionStringBuilder { DataSource = "./PhotoLabeler.db" };
 				var connection = new SqliteConnection(connectionStringBuilder.ConnectionString);
 				return connection;
 			});
 			services.AddSingleton<IAppConfigRepository, AppConfigRepository>();
-			services.AddSingleton<IPhotoRepository, PhotoRepository>();
+			services.AddSingleton<IGeolocationRepository, GeolocationRepository>();
 
 			services.AddSingleton(typeof(NominatimAgentConfig), (provider) =>
 			{

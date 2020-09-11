@@ -21,6 +21,7 @@ namespace PhotoLabeler.Pages
 
 		private Grid _gridData = null;
 
+
 		private string _statusText = string.Empty;
 
 		private Components.Grid _gridRef = null;
@@ -103,11 +104,15 @@ namespace PhotoLabeler.Pages
 				_cancellationTokenSource.Cancel();
 				_gridData = null;
 				StateHasChanged();
+				await Task.Delay(200);
 				_cancellationTokenSource = new CancellationTokenSource();
-				await Task.Delay(1, _cancellationTokenSource.Token);
 
 				// new data
+				_gridRef?.NotifyShouldRenderAfterSetParameter();
+				_statusText = localizer["Loading photos metadata..."];
+				StateHasChanged();
 				_gridData = await photoLabelerService.GetGridFromTreeViewItemAsync(item, _cancellationTokenSource.Token);
+				_statusText = localizer["Metadata loaded."];
 				if (_gridData.HasErrors)
 				{
 					var errorsCount = _gridData.Errors.InnerExceptions.Count();

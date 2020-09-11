@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Juanjo Montiel and contributors. All Rights Reserved. Licensed under the GNU General Public License, Version 2.0. See LICENSE in the project root for license information.
 
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -16,6 +15,7 @@ using PhotoLabeler.Data.Interfaces;
 using PhotoLabeler.Entities;
 using PhotoLabeler.Nominatim.Agent;
 using PhotoLabeler.Nominatim.Agent.Entities;
+using PhotoLabeler.Nominatim.Agent.Exceptions;
 using PhotoLabeler.PhotoStorageReader.Interfaces;
 using PhotoLabeler.ServiceLibrary.Exceptions;
 using PhotoLabeler.ServiceLibrary.Interfaces;
@@ -29,7 +29,7 @@ namespace PhotoLabeler.ServiceLibrary.Implementations
 		{
 			public List<Photo> Photos { get; set; }
 
-			public List<Photo> PhotosToAddIntoDatabase { get; set; }
+			public List<Geolocation> GeolocationsToAddIntoDatabase { get; set; }
 
 		}
 
@@ -42,12 +42,11 @@ namespace PhotoLabeler.ServiceLibrary.Implementations
 
 		private readonly INominatimAgent _nominatimAgent;
 
-		private readonly IPhotoRepository _photoRepository;
+		private readonly IGeolocationRepository _geolocationRepository;
 
-		private readonly ICryptoService _cryptoService;
+		private readonly IDebugService _debugService;
 
 		private readonly ILogger _logger;
-
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="PhotoLabelerService" /> class.
@@ -63,8 +62,8 @@ namespace PhotoLabeler.ServiceLibrary.Implementations
 			IStringLocalizer<PhotoLabelerService> localizer,
 			IPhotoReader photoReader,
 			INominatimAgent nominatimAgent,
-			IPhotoRepository photoRepository,
-			ICryptoService cryptoService,
+			IGeolocationRepository geolocationRepository,
+			IDebugService debugService,
 			ILogger logger
 			)
 		{
@@ -72,82 +71,84 @@ namespace PhotoLabeler.ServiceLibrary.Implementations
 			_localizer = localizer;
 			_photoReader = photoReader;
 			_nominatimAgent = nominatimAgent;
-			_photoRepository = photoRepository;
-			_cryptoService = cryptoService;
+			_geolocationRepository = geolocationRepository;
+			_debugService = debugService;
 			_logger = logger;
 		}
-
-
 
 		/// <summary>
 		/// Gets the photos from dir asynchronous.
 		/// </summary>
 		/// <param name="directory">The directory.</param>
-		/// <param name="loadRecursively">if set to <c>true</c> [load recursively].</param>
+		/// <param name="recursiveLoading">if set to <c>true</c> [load recursively].</param>
 		/// <param name="cancellationToken">The cancellation token.</param>
 		/// <returns></returns>
-		public async Task<TreeView<Photo>> GetTreeViewFromDirAsync(string directory, bool loadRecursively = false, CancellationToken cancellationToken = default)
+		public Task<TreeView<Photo>> GetTreeViewFromDirAsync(string directory, bool recursiveLoading = false, CancellationToken cancellationToken = default)
 		{
-			TreeView<Photo> treeView = new TreeView<Photo>();
-			directory = directory.TrimEnd(new[] { Path.DirectorySeparatorChar });
-			var directoriesFound = await Task.Run(() => Directory.GetDirectories(directory, string.Empty, SearchOption.AllDirectories), cancellationToken);
-			var dirLength = directory.Length;
-			var directories = directoriesFound.Select(i => i.Substring(dirLength + 1)).OrderBy(i => i.Length).ThenBy(i => i).ToList();
-			directories.Insert(0, string.Empty);
-			var items = new List<TreeViewItem<Photo>>();
-			var flatItems = new List<TreeViewItem<Photo>>();
-			var levelBase = directory.Length - directory.Replace(Path.DirectorySeparatorChar.ToString(), string.Empty).Length;
-			foreach (var dir in directories)
+			_logger.Debug($"Enterin in GetTreeViewFromDirAsync. Directory: {directory}. Recursive loading: {recursiveLoading}.");
+			return _debugService.MeasureExecutionAsync("GetTreeViewFromDirAsync", async () =>
 			{
-				var fullDir = Path.Combine(directory, dir);
-				var dirName = fullDir.TrimEnd(new[] { Path.DirectorySeparatorChar });
-				dirName = dirName.Substring(dirName.LastIndexOf(Path.DirectorySeparatorChar) + 1);
-				var level = fullDir.Length - fullDir.Replace(Path.DirectorySeparatorChar.ToString(), string.Empty).Length - levelBase;
-				if (level == 0)
+				TreeView<Photo> treeView = new TreeView<Photo>();
+				directory = directory.TrimEnd(new[] { Path.DirectorySeparatorChar });
+				var directoriesFound = await Task.Run(() => Directory.GetDirectories(directory, string.Empty, SearchOption.AllDirectories), cancellationToken);
+				var dirLength = directory.Length;
+				var directories = directoriesFound.Select(i => i.Substring(dirLength + 1)).OrderBy(i => i.Length).ThenBy(i => i).ToList();
+				directories.Insert(0, string.Empty);
+				var items = new List<TreeViewItem<Photo>>();
+				var flatItems = new List<TreeViewItem<Photo>>();
+				var levelBase = directory.Length - directory.Replace(Path.DirectorySeparatorChar.ToString(), string.Empty).Length;
+				foreach (var dir in directories)
 				{
-					var treeViewItem = new TreeViewItem<Photo> { Path = fullDir, Children = new List<TreeViewItem<Photo>>(), Name = dirName, TreeView = treeView, Level = 0 };
-					if (loadRecursively)
+					var fullDir = Path.Combine(directory, dir);
+					var dirName = fullDir.TrimEnd(new[] { Path.DirectorySeparatorChar });
+					dirName = dirName.Substring(dirName.LastIndexOf(Path.DirectorySeparatorChar) + 1);
+					var level = fullDir.Length - fullDir.Replace(Path.DirectorySeparatorChar.ToString(), string.Empty).Length - levelBase;
+					if (level == 0)
 					{
-						var photos = await GetPhotosFromDirAsync(treeViewItem.Path, cancellationToken);
-						treeViewItem.Items = photos.ToList();
-						treeViewItem.ItemsLoaded = true;
-					}
+						var treeViewItem = new TreeViewItem<Photo> { Path = fullDir, Children = new List<TreeViewItem<Photo>>(), Name = dirName, TreeView = treeView, Level = 0 };
+						if (recursiveLoading)
+						{
+							var photos = await GetPhotosFromDirAsync(treeViewItem.Path, cancellationToken);
+							treeViewItem.Items = photos.ToList();
+							treeViewItem.ItemsLoaded = true;
+						}
 
-					treeViewItem.ItemIndex = items.Count;
-					items.Add(treeViewItem);
-					flatItems.Add(treeViewItem);
-				}
-				else
-				{
-					var parentDir = fullDir.Substring(0, fullDir.LastIndexOf(Path.DirectorySeparatorChar.ToString()));
-					TreeViewItem<Photo> parentItem = null;
-					parentItem = flatItems.Single(i => i.Path == parentDir);
-					var treeViewItem = new TreeViewItem<Photo>() { Path = fullDir, Parent = parentItem, Children = new List<TreeViewItem<Photo>>(), Name = dirName, TreeView = treeView, Level = level };
-					if (loadRecursively)
+						treeViewItem.ItemIndex = items.Count;
+						items.Add(treeViewItem);
+						flatItems.Add(treeViewItem);
+					}
+					else
 					{
-						var photos = await GetPhotosFromDirAsync(treeViewItem.Path, cancellationToken);
-						treeViewItem.Items = photos.ToList();
-						treeViewItem.ItemsLoaded = true;
-					}
+						var parentDir = fullDir.Substring(0, fullDir.LastIndexOf(Path.DirectorySeparatorChar.ToString()));
+						TreeViewItem<Photo> parentItem = null;
+						parentItem = flatItems.Single(i => i.Path == parentDir);
+						var treeViewItem = new TreeViewItem<Photo>() { Path = fullDir, Parent = parentItem, Children = new List<TreeViewItem<Photo>>(), Name = dirName, TreeView = treeView, Level = level };
+						if (recursiveLoading)
+						{
+							var photos = await GetPhotosFromDirAsync(treeViewItem.Path, cancellationToken);
+							treeViewItem.Items = photos.ToList();
+							treeViewItem.ItemsLoaded = true;
+						}
 
-					treeViewItem.ItemIndex = parentItem.Children.Count;
-					parentItem.Children.Add(treeViewItem);
-					flatItems.Add(treeViewItem);
+						treeViewItem.ItemIndex = parentItem.Children.Count;
+						parentItem.Children.Add(treeViewItem);
+						flatItems.Add(treeViewItem);
+					}
 				}
-			}
-			items[0].Selected = items[0].Expanded = true;
-			treeView.Items = items;
-			treeView.SelectedItem = items[0];
-			treeView.FlatItems = new Lazy<List<TreeViewItem<Photo>>>(() =>
-			{
-				var list = new List<TreeViewItem<Photo>>();
-				foreach (var item in items)
+				items[0].Selected = items[0].Expanded = true;
+				treeView.Items = items;
+				treeView.SelectedItem = items[0];
+				treeView.FlatItems = new Lazy<List<TreeViewItem<Photo>>>(() =>
 				{
-					list.AddRange(FlattensItems(item));
-				}
-				return list;
+					var list = new List<TreeViewItem<Photo>>();
+					foreach (var item in items)
+					{
+						list.AddRange(FlattensItems(item));
+					}
+					return list;
+				});
+				return treeView;
 			});
-			return treeView;
 		}
 
 		/// <summary>
@@ -158,7 +159,7 @@ namespace PhotoLabeler.ServiceLibrary.Implementations
 		/// <returns></returns>
 		public async Task<IEnumerable<Photo>> GetPhotosFromDirAsync(string directory, CancellationToken cancellationToken)
 		{
-			_logger.Debug($"Loading photos for the directory {directory}...");
+			_logger.Debug($"Enterin in GetPhotosFromDirAsync. Directory: {directory}.");
 			var files = await Task.Run(() => Directory.GetFiles(directory, string.Empty, SearchOption.TopDirectoryOnly), cancellationToken);
 			var supportedExtensions = new[] { ".jpg", ".heic", ".mov", ".png", ".gif", ".jpeg", ".tiff", ".raw", ".mp4" };
 			var filteredFiles = files.Where(i => supportedExtensions.Contains(Path.GetExtension(i.ToLower()))).ToList();
@@ -168,21 +169,7 @@ namespace PhotoLabeler.ServiceLibrary.Implementations
 				return new List<Photo>();
 			}
 
-			var md5SignaturesDict = await GetMd5SignatureFromFilesAsync(filteredFiles, cancellationToken);
-			_logger.Debug("Get stored photos in database with this list of MD5 sum...");
-			var storedPhotos = await _photoRepository.GetPhotosByMd5ListAsync(string.Join(",", md5SignaturesDict.Values));
-			_logger.Debug($"Photos retrieved successfully from database. {storedPhotos.Count()} exist.");
-			_logger.Debug("Retrieving photo information from database or file metadata...");
-			var photosInfo = await GetPhotosFromFileOrDatabaseAsync(md5SignaturesDict, storedPhotos);
-			var distinctPhotosToAdd = photosInfo.PhotosToAddIntoDatabase.DistinctBy(d => d.Md5Sum).ToList();
-			_logger.Debug($"There are {distinctPhotosToAdd.Count} photos to add into database...");
-			foreach (var photo in distinctPhotosToAdd)
-			{
-				_logger.Debug($"Adding photo {photo.Path} into database...");
-				await _photoRepository.AddPhotoAsync(photo);
-				_logger.Debug($"Photo {photo.Path} added into database.");
-			}
-			return photosInfo.Photos;
+			return await GetPhotosFromFilesAsync(filteredFiles, cancellationToken);
 		}
 
 		/// <summary>
@@ -261,20 +248,33 @@ namespace PhotoLabeler.ServiceLibrary.Implementations
 				row.Cells.Add(labelCell);
 
 				//
-				var locationCell = new Grid.GridLocationCell(cellIndex: row.Cells.Count, row: row, grid: grid);
-				var language = CultureInfo.CurrentCulture.Name;
-				var localizedInfo = photo.LocalizedInfo.SingleOrDefault(lc => lc.Language == language);
-				if (localizedInfo != null)
+				var locationCell = new Grid.GridLocationCell(cellIndex: row.Cells.Count, row: row, grid: grid)
 				{
-					locationCell.Text = localizedInfo.Location;
+					Latitude = photo.Latitude,
+					Longitude = photo.Longitude
+				};
+
+				if (!photo.HasGPSInformation)
+				{
+					locationCell.Text = _localizer["No GPS information"];
+					locationCell.LocationLoaded = true;
+				}
+				else if (!string.IsNullOrWhiteSpace(photo.LocationError))
+				{
+					locationCell.Text = locationCell.LocationError = photo.LocationError;
+					locationCell.LocationLoaded = true;
+				}
+				else if (!string.IsNullOrWhiteSpace(photo.LocationInfo))
+				{
+					locationCell.Text = photo.LocationInfo;
 					locationCell.LocationLoaded = true;
 				}
 				else
 				{
-					locationCell.Text = photo.Latitude.HasValue && photo.Longitude.HasValue ? _localizer["Loading location..."] : _localizer["No GPS information"];
+					locationCell.Text = _localizer["Loading location..."];
 					locationCell.Latitude = photo.Latitude;
 					locationCell.Longitude = photo.Longitude;
-					locationCell.LoadLocation = LoadLocation;
+					locationCell.LoadLocation = () => LoadLocation(locationCell);
 				}
 				row.Cells.Add(locationCell);
 
@@ -328,41 +328,92 @@ namespace PhotoLabeler.ServiceLibrary.Implementations
 			cell.SrcBase64 = img;
 		}
 
-		private async Task LoadLocation(Grid.GridLocationCell locationCell)
+		/// <summary>
+		/// Loads the location for an specific location cell..
+		/// </summary>
+		/// <param name="locationCell">The location cell.</param>
+		/// <returns><c>true</c> if the location has been loaded from external services, <c>false</c> if the location has been retrieved from database. This can be used to delay queries and avoid api penalties</returns>
+		private async Task<bool> LoadLocation(Grid.GridLocationCell locationCell)
 		{
+			var picturePath = locationCell.Row.PicturePath;
+			_logger.Debug($"Entering in LoadLocation for photo {picturePath}.");
 			if (locationCell.LocationLoaded)
 			{
-				return;
+				_logger.Debug($"The location for {picturePath} is already loaded. Exiting.");
+				return false;
 			}
-			_logger.Debug($"Loading location for photo {locationCell.Row.PicturePath}...");
-			if (!locationCell.Latitude.HasValue || !locationCell.Longitude.HasValue)
+
+			_logger.Debug($"Loading location for photo {picturePath}...");
+			if (!locationCell.HasGPSInformation)
 			{
-				_logger.Debug($"The location cell has not latitude or longitude. Exiting.");
+				_logger.Debug($"The photo {picturePath} has not GPS information.");
 				locationCell.LocationLoaded = true;
-				return;
+				return false;
 			}
 			try
 			{
+				var currentLanguage = CultureInfo.CurrentCulture.Name;
+
+				var geolocation = await _geolocationRepository.GetGeolocationByCoordinatesAsync(locationCell.Latitude.Value, locationCell.Longitude.Value);
+				if (geolocation != null && geolocation.LocalizedInfo.Any(l => l.Language == currentLanguage))
+				{
+					locationCell.Text = geolocation.LocalizedInfo.Single(l => l.Language == currentLanguage).Location;
+					locationCell.LocationLoaded = true;
+					return false;
+				}
 				var result = await _nominatimAgent.ReverseGeocodeAsync(new ReverseGeocodeRequest { Latitude = locationCell.Latitude.Value, Longitude = locationCell.Longitude.Value, Language = CultureInfo.CurrentCulture.Name });
+				_logger.Debug($"Location retrieved from external API for {picturePath}: {result.DisplayName}.");
 				locationCell.Text = result.DisplayName;
 				locationCell.LocationLoaded = true;
-				var photos = (await _photoRepository.GetPhotosByCoordinatesAsync(locationCell.Latitude.Value, locationCell.Longitude.Value))
-					.Where(p => p.LocalizedInfo != null && p.LocalizedInfo.Any(li => li.Language == CultureInfo.CurrentCulture.Name));
-				if (photos.Any())
+				_logger.Debug($"Searching for this location ({locationCell.Latitude.Value}, {locationCell.Longitude.Value}) for photo {picturePath} into database...");
+				if (geolocation is null)
 				{
-					var localizedInfo = new PhotoLocalizedInfo { Language = CultureInfo.CurrentCulture.Name, Location = result.DisplayName };
-					foreach (var photo in photos)
+					_logger.Debug($"The location associated to {picturePath} does not exists into database.");
+					geolocation = new Geolocation
 					{
-						photo.LocalizedInfo.Add(localizedInfo);
-						await _photoRepository.EditPhotoAsync(photo);
-					}
+						Latitude = locationCell.Latitude.Value,
+						Longitude = locationCell.Longitude.Value,
+						LocalizedInfo = new List<GeolocationLocalizedInfo> {
+							new GeolocationLocalizedInfo { Language = CultureInfo.CurrentCulture.Name, Location = result.DisplayName }
+						}
+					};
+					await _geolocationRepository.AddGeolocationAsync(geolocation);
+					_logger.Debug($"Location for {picturePath} ({locationCell.Latitude.Value}, {locationCell.Longitude.Value}) added into database.");
 				}
-				await Task.Delay(1000);
+				else
+				{
+					_logger.Debug($"Location {locationCell.Latitude.Value}, {locationCell.Longitude.Value} Already exists into database. Adding the information for {CultureInfo.CurrentCulture.Name}...");
+					geolocation.LocalizedInfo.Add(new GeolocationLocalizedInfo { Language = CultureInfo.CurrentCulture.Name, Location = result.DisplayName });
+					await _geolocationRepository.EditGeolocationAsync(geolocation);
+					_logger.Debug($"Location for photo {picturePath} updated into database.");
+				}
+				return true;
 			}
 			catch (Exception ex)
 			{
 				_logger.Error(ex, "Error when loading location.");
 				locationCell.Text = _localizer["Error when retrieving location: {0}.", ex.Message];
+				locationCell.LocationLoaded = true;
+				// To avoid multiple queries to point with errors, we store into database the errors produced for a specific location
+				// but only nominatim errors, not network errors which could be transient.
+				if (ex is NominatimException nominatimException)
+				{
+					_logger.Warning($"Error while retrieving location due to nominatim issue: {nominatimException.Message}. Trying to add this error into database.");
+					try
+					{
+						var geolocation = _geolocationRepository.GetGeolocationByCoordinatesAsync(locationCell.Latitude.Value, locationCell.Longitude.Value);
+						if (geolocation is null)
+						{
+							await _geolocationRepository.AddGeolocationAsync(new Geolocation { Latitude = locationCell.Latitude.Value, Longitude = locationCell.Longitude.Value, Error = ex.Message });
+						}
+						// if the geolocation exists into database, it means that before now, we were able to retrieve the geolocation description for other language, so the error could be transient.
+					}
+					catch (Exception repoException)
+					{
+						_logger.Error(repoException, "Error when storing location with error into database.");
+					}
+				}
+				return true;
 			}
 		}
 
@@ -385,81 +436,86 @@ namespace PhotoLabeler.ServiceLibrary.Implementations
 
 
 
-		private async Task<Dictionary<string, string>> GetMd5SignatureFromFilesAsync(List<string> filteredFiles, CancellationToken cancellationToken)
+
+		private Task<IEnumerable<Photo>> GetPhotosFromFilesAsync(IEnumerable<string> files, CancellationToken cancellationToken)
 		{
-			var md5SignaturesDict = new Dictionary<string, string>();
-			_logger.Debug("Calculating MD5 sum for all supported files...");
-			using (var semaphore = new SemaphoreSlim(200))
+			_logger.Debug($"Enterin in GetPhotosFromFilesAsync. {files.Count()} files will be loaded.");
+			return _debugService.MeasureExecutionAsync("GetPhotosFromFilesAsync", async () =>
 			{
-				var tasksRetrievingMd5 = filteredFiles.Select(async i =>
+				using var semaphore = new SemaphoreSlim(Environment.ProcessorCount * 30);
+				var tasksRetrievingPhotos = files.Select(async f =>
 				{
-					if (cancellationToken.IsCancellationRequested)
-					{
-						throw new TaskCanceledException("The task was canceled.");
-					}
+					CheckCancellationPending(cancellationToken);
 					try
 					{
 						await semaphore.WaitAsync();
-						return await _cryptoService.GetMd5FromFileAsync(i, cancellationToken);
+						_logger.Debug($"Retrieving metadatas from file {f}...");
+						return await _photoInfoService.GetPhotoFromFileAsync(f, cancellationToken);
+					}
+					catch (Exception ex) when (!(ex is TaskCanceledException))
+					{
+						return new Photo
+						{
+							Path = f,
+							Error = new LoadPhotoException($"Error while loading the photo {f}: {ex.Message}", f, ex),
+						};
 					}
 					finally
 					{
 						semaphore.Release();
 					}
 				}).ToList();
-				await Task.WhenAll(tasksRetrievingMd5);
-				for (var i = 0; i < filteredFiles.Count; i++)
-				{
-					md5SignaturesDict.Add(filteredFiles[i], tasksRetrievingMd5[i].Result);
-				}
-			}
-			_logger.Debug("All mD5 sum calculated.");
-			return md5SignaturesDict;
-		}
-
-		private async Task<PhotoRetrievalResult> GetPhotosFromFileOrDatabaseAsync(Dictionary<string, string> md5SignaturesDict, IEnumerable<Photo> storedPhotos)
-		{
-			var photosToAdd = new ConcurrentBag<Photo>();
-			using var semaphore = new SemaphoreSlim(200);
-			var tasksRetrievingPhotos = md5SignaturesDict.Select(async i =>
-			{
 				try
 				{
-					await semaphore.WaitAsync();
-					var photo = storedPhotos.SingleOrDefault(p => p.Md5Sum == i.Value);
-					if (photo != null)
-					{
-						_logger.Debug($"The photo with MD5 {i.Value} is in database. Returning this photo.");
-						return photo;
-					}
-					_logger.Debug($"The photo with MD5 {i.Value} is not in the database. Getting the information from file metadata...");
-					photo = await _photoInfoService.GetPhotoFromFileAsync(i.Key);
-					photo.Md5Sum = i.Value;
-					photosToAdd.Add(photo);
-					return photo;
+					await Task.WhenAll(tasksRetrievingPhotos);
 				}
 				catch (Exception ex)
 				{
-					return new Photo
+					if (cancellationToken.IsCancellationRequested)
 					{
-						Md5Sum = i.Value,
-						Path = i.Key,
-						Error = new LoadPhotoException($"Error while loading the photo {i.Key}: {ex.Message}", i.Key, ex),
-					};
+						throw new TaskCanceledException("The task was canceled.");
+					}
+					throw;
 				}
-				finally
+				_logger.Debug("Finished photo retrieval.");
+				var photos = tasksRetrievingPhotos.Select(t => t.Result);
+
+				CheckCancellationPending(cancellationToken);
+
+				// check existing locations
+				var currentLanguage = CultureInfo.CurrentCulture.Name;
+				var points = photos.Where(p => p.HasGPSInformation).Select(p => new GeolocationPoint { Latitude = p.Latitude.Value, Longitude = p.Longitude.Value }).Distinct().ToList();
+				_logger.Debug($"Encontered {points.Count} distinct coordinates.");
+				var existingGeolocations = (await _geolocationRepository.GetGeolocationsByCoordinatesListAsync(points)).Where(l => !string.IsNullOrWhiteSpace(l.Error) || l.LocalizedInfo.Any(li => li.Language == currentLanguage));
+				_logger.Debug($"{existingGeolocations.Count()} found.");
+
+				if (existingGeolocations.Any())
 				{
-					semaphore.Release();
+					foreach (var existingGeolocation in existingGeolocations)
+					{
+						var photosWithGeo = photos.Where(p => p.HasGPSInformation && p.Latitude.Value == existingGeolocation.Latitude && p.Longitude.Value == existingGeolocation.Longitude).ToList();
+						_logger.Debug($"Encontered {photosWithGeo.Count} photos for coordinates {existingGeolocation}.");
+						if (photosWithGeo.Any())
+						{
+							photosWithGeo.ForEach(p =>
+							{
+								p.DbLocationExists = true;
+								if (!string.IsNullOrWhiteSpace(existingGeolocation.Error))
+								{
+									p.LocationError = existingGeolocation.Error;
+								}
+								else
+								{
+									p.LocationInfo = existingGeolocation.LocalizedInfo.Single(l => l.Language == currentLanguage).Location;
+								}
+							});
+						}
+					}
 				}
-			}).ToList();
-			await Task.WhenAll(tasksRetrievingPhotos);
-			_logger.Debug("Finished photo retrieval.");
-			return new PhotoRetrievalResult
-			{
-				Photos = tasksRetrievingPhotos.Select(t => t.Result).ToList(),
-				PhotosToAddIntoDatabase = photosToAdd.ToList(),
-			};
+				return photos;
+			});
 		}
+
 
 		private async Task<bool> RenameItemAsync(string basePath, Photo photo, int prefixIndex, int totalFiles, bool addPrefix)
 		{
@@ -554,7 +610,7 @@ namespace PhotoLabeler.ServiceLibrary.Implementations
 			var renamingResult = new RenamingResult();
 			int totalRenamed = 0;
 
-			using (SemaphoreSlim semaphore = new SemaphoreSlim(200))
+			using (SemaphoreSlim semaphore = new SemaphoreSlim(Environment.ProcessorCount * 30))
 			{
 				var itemsWithLabel = directory.Items.Where(i => !string.IsNullOrWhiteSpace(i.Label)).ToList();
 				renamingResult.TotalFiles = itemsWithLabel.Count;
@@ -603,5 +659,12 @@ namespace PhotoLabeler.ServiceLibrary.Implementations
 			return renamingResult;
 		}
 
+		private void CheckCancellationPending(CancellationToken cancellationToken)
+		{
+			if (cancellationToken.IsCancellationRequested)
+			{
+				throw new TaskCanceledException("Te task was canceled.");
+			}
+		}
+		}
 	}
-}

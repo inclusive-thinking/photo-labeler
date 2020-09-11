@@ -1,3 +1,0 @@
-[submodule "metadata-extractor"]
-	path = metadata-extractor
-	url = https://github.com/kastwey/metadata-extractor-dotnet

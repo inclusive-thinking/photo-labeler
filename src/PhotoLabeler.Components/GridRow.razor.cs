@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Juanjo Montiel and contributors. All Rights Reserved. Licensed under the GNU General Public License, Version 2.0. See LICENSE in the project root for license information.
 
+
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
@@ -33,8 +34,12 @@ namespace PhotoLabeler.Components
 			var locationCell = Row.Cells.FirstOrDefault(c => c is Entities.Grid.GridLocationCell) as Entities.Grid.GridLocationCell;
 			if (locationCell != null && locationCell.LoadLocation != null)
 			{
-				await locationCell.LoadLocation?.Invoke(locationCell);
+				var loadedFromExternalApi = await locationCell.LoadLocation();
 				await InvokeAsync(StateHasChanged);
+				if (loadedFromExternalApi)
+				{
+					await Task.Delay(1000);
+				}
 			}
 		}
 

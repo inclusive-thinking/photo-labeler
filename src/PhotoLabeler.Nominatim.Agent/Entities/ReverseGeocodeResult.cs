@@ -33,5 +33,11 @@ namespace PhotoLabeler.Nominatim.Agent.Entities
 
 		[JsonProperty("boundingbox")]
 		public List<string> BoundingBox { get; set; }
+
+		[JsonProperty("error")]
+		public string Error { get; set; }
+
+		public bool HasErrors => !string.IsNullOrWhiteSpace(Error);
+
 	}
 }
