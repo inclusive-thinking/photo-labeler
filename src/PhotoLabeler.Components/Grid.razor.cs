@@ -14,10 +14,11 @@ using Serilog;
 
 namespace PhotoLabeler.Components
 {
-	internal class VisibleItem
+	internal class RenderedItem
 	{
-		public Entities.Grid.GridRow Item { get; set; }
-		public GridRow Reference { get; set; }
+
+		public Entities.Grid.GridRow Model { get; set; }
+ 		public GridRow ComponentRef { get; set; }
 	}
 
 	public partial class Grid : IDisposable
@@ -34,13 +35,13 @@ namespace PhotoLabeler.Components
 		[Parameter]
 		public string Id { get; set; } = Guid.NewGuid().ToString();
 
-		private bool _focusOnItemAfterRender = false;
+		private bool _shouldRender = false;
+
+		private string _accessibleMessage;
 
 		private AccessibleAlert _accessibleAlertRef;
 
-		private bool _shouldRender = false;
-
-		private List<VisibleItem> _visibleItems;
+		private List<RenderedItem> _renderedItems;
 
 		private uint _parmVersion = 0;
 
@@ -59,15 +60,21 @@ namespace PhotoLabeler.Components
 
 		protected override Task OnParametersSetAsync()
 		{
-			Logger.Debug("Entering OnParameterSetAsync...");
+			Logger.Debug($"Entering {nameof(OnParametersSetAsync)}...");
 			_parmVersion++;
-			_visibleItems =
+			if (Model is null)
+			{
+				return Task.CompletedTask;
+			}
+
+			_renderedItems =
 				Model
 				.Body
 				.Rows
 				.Where(r => r.Visible)
-				.Select(r => new VisibleItem { Item = r })
+				.Select(r => new RenderedItem { Model = r })
 				.ToList();
+			Logger.Debug($"Items to be rendered: {_renderedItems.Count}.");
 			return Task.CompletedTask;
 		}
 
@@ -75,19 +82,18 @@ namespace PhotoLabeler.Components
 		{
 			Logger.Debug("Entering in OnAfterRenderAsync...");
 			await base.OnAfterRenderAsync(firstRender);
-
-			if (_focusOnItemAfterRender)
-			{
-				await JSRuntime.InvokeVoidAsync("jsInteropFunctions.focusSelectedItemInsideContainer", Id);
-			}
-
-			_ = RefillImagesAndLocations();
+			await Task.Delay(1);
+			_ = LoadImagesAndLocations();
 			_shouldRender = false;
 		}
 
+		public void NotifyShouldRenderAfterSetParameter()
+		{
+			_shouldRender = true;
+		}
 		private async Task OnKeyDown(KeyboardEventArgs e)
 		{
-			Logger.Debug($"ONKeyDown in grid: {e.Key}.");
+			Logger.Debug($"ONKeyDown on grid: {e.Key}.");
 			var focus = false;
 			Entities.Grid.GridCell newSelectedCell = null;
 			var selectedCell = Model.SelectedCell;
@@ -148,29 +154,37 @@ namespace PhotoLabeler.Components
 				newSelectedCell.Selected = true;
 				Model.SelectedCell = newSelectedCell;
 				Model.PreviousSelectedCell = selectedCell;
-				var selectedReference = _visibleItems.SingleOrDefault(it => it.Item.RowIndex == selectedCell.Row.RowIndex);
-				var newSelectedReference = _visibleItems.SingleOrDefault(it => it.Item.RowIndex == newSelectedCell.Row.RowIndex);
-				if (selectedReference?.Reference != null)
+				var selectedReference = _renderedItems.SingleOrDefault(it => it.Model.RowIndex == selectedCell.Row.RowIndex);
+				var newSelectedReference = _renderedItems.SingleOrDefault(it => it.Model.RowIndex == newSelectedCell.Row.RowIndex);
+				if (selectedReference?.ComponentRef != null)
 				{
-					await selectedReference.Reference.NotifyShouldRender();
+					await selectedReference.ComponentRef.NotifyShouldRender();
 				}
 
-				if (newSelectedReference?.Reference != null && newSelectedReference != selectedReference)
+				if (newSelectedReference?.ComponentRef != null && newSelectedReference != selectedReference)
 				{
-					await newSelectedReference.Reference.NotifyShouldRender();
+					await newSelectedReference.ComponentRef.NotifyShouldRender();
+					await newSelectedReference.ComponentRef.ScrollIntoRow();
 				}
 				_accessibleAlertRef.Text = GetAriaText();
 				_accessibleAlertRef.NotifyShouldRender();
-				// await _accessibleAlertRef.NotifyShouldRender();
 			}
 		}
+
+		private async Task OnFocus()
+		{
+			_accessibleAlertRef.Text = GetAriaText(true);
+			await _accessibleAlertRef.NotifyShouldRender();
+		}
+
+
 		private string GetAriaText(bool readAllInformation = false)
 		{
 			if (Model.SelectedCell is null)
 			{
 				if (readAllInformation)
 				{
-					return Localizer["Table with {0} columns and {1} rows.", Model.Header.Row.Cells.Count, Model.Body.Rows.Count];
+					return Localizer["Table with {0} columns and {1} rows.", Model.Header.Row.Cells.Count, Model.Body.Rows.Count(r => r.Visible)];
 				}
 				else
 				{
@@ -179,7 +193,7 @@ namespace PhotoLabeler.Components
 			}
 
 			string text;
-			int currentColumn = Model.SelectedCell.CellIndex + 1, currentRow = Model.SelectedCell.Row.RowIndex + 1;
+			int currentColumn = Model.SelectedCell.CellIndex + 1, currentRow = Model.SelectedCell.Row.GetRowIndexWithFilters() + 1;
 			var cellText = Model.SelectedCell.ToString().Trim(new[] { '.', ',', ':' });
 			string order = string.Empty;
 			var correspondingHeader = Model.Header.Row.Cells[currentColumn - 1];
@@ -245,7 +259,7 @@ namespace PhotoLabeler.Components
 			return Localizer[
 				text,
 				Model.Header.Row.Cells.Count,
-				Model.Body.Rows.Count,
+				Model.Body.Rows.Count(r => r.Visible),
 				headerText,
 				cellText,
 				order,
@@ -254,26 +268,26 @@ namespace PhotoLabeler.Components
 				];
 		}
 
-		private async Task RefillImagesAndLocations()
+		private async Task LoadImagesAndLocations()
 		{
-			Logger.Debug("Entering in RefillImagesAsync...");
+			Logger.Debug($"Entering in {nameof(LoadImagesAndLocations)}...");
 
 			// current grid parameters version
-			var filling = _parmVersion;
+			var loadingVersion = _parmVersion;
 
-			// is refilling needed?
-			var noNeedToRefillImages = _parmVersion <= _parmVersionLastRendered;
-			if (noNeedToRefillImages)
+			// is loading needed?
+			var noNeedToLoadImages = _parmVersion <= _parmVersionLastRendered;
+			if (noNeedToLoadImages)
 			{
-				Logger.Debug($"{nameof(_parmVersion)}: {_parmVersion}. {nameof(_parmVersionLastRendered)}: {_parmVersionLastRendered}. {nameof(noNeedToRefillImages)}: {noNeedToRefillImages}.");
+				Logger.Debug($"{nameof(_parmVersion)}: {_parmVersion}. {nameof(_parmVersionLastRendered)}: {_parmVersionLastRendered}. {nameof(noNeedToLoadImages)}: {noNeedToLoadImages}.");
 				return;
 			}
 
 			// local version of items
-			var copyOfVisibleItems = _visibleItems.ToList();
+			var items = _renderedItems.ToList();
 
 			// are references available?
-			var referencesAreAvailable = copyOfVisibleItems.FirstOrDefault()?.Reference != null;
+			var referencesAreAvailable = items.FirstOrDefault()?.ComponentRef != null;
 			if (!referencesAreAvailable)
 			{
 				Logger.Information("There are no references to use.");
@@ -284,18 +298,19 @@ namespace PhotoLabeler.Components
 			_cancellationTokenSource = new CancellationTokenSource();
 			Logger.Debug("Cancelled the previous operation.");
 			// let's try to fill
-			_parmVersionLastRendered = filling;
-			var loadImagesTask = LoadImages(copyOfVisibleItems, filling, _cancellationTokenSource.Token);
-			var loadLocationsTask = LoadLocations(copyOfVisibleItems, filling, _cancellationTokenSource.Token);
+			_parmVersionLastRendered = loadingVersion;
+			var loadImagesTask = LoadImages(items, loadingVersion, _cancellationTokenSource.Token);
+			var loadLocationsTask = LoadLocations(items, loadingVersion, _cancellationTokenSource.Token);
 			await Task.WhenAll(loadImagesTask, loadLocationsTask);
 		}
 
-		private async Task LoadImages(List<VisibleItem> copyOfVisibleItems, uint filling, CancellationToken cancellationToken)
+		private async Task LoadImages(List<RenderedItem> items, uint filling, CancellationToken cancellationToken)
 		{
 			Logger.Information("Starting image loading...");
-			foreach (var vi in copyOfVisibleItems)
+			for (int i = 0; i < items.Count; i++)
 			{
-				Logger.Debug($"Loading image {vi.Item.PicturePath}...");
+				var item = items[i];
+				Logger.Debug($"Loading image {(i + 1)} of {items.Count}: {item.Model.PicturePath}...");
 				var fillingWrongVersion = filling != _parmVersion;
 				if (fillingWrongVersion || _disposed || cancellationToken.IsCancellationRequested)
 				{
@@ -304,24 +319,25 @@ namespace PhotoLabeler.Components
 					return;
 				}
 				await Task.Delay(1);
-				await vi.Reference.ReloadImage();
+				await item.ComponentRef.ReloadImage();
 			}
 		}
 
-		private async Task LoadLocations(List<VisibleItem> copyOfVisibleItems, uint filling, CancellationToken cancellationToken)
+		private async Task LoadLocations(List<RenderedItem> items, uint filling, CancellationToken cancellationToken)
 		{
-			Logger.Debug("Starting location loading...");
-			foreach (var vi in copyOfVisibleItems)
+			Logger.Debug($"Entering in {nameof(LoadLocations)}. There are {items.Count} items to analize.");
+			for (int i = 0; i < items.Count; i++)
 			{
-				Logger.Debug($"Loading image {vi.Item.PicturePath}...");
+				var reference = items[i];
+				Logger.Debug($"Loading location {reference.Model.PicturePath} (item {(i + 1)} of {items.Count})...");
 				var fillingWrongVersion = filling != _parmVersion;
 				if (fillingWrongVersion || _disposed || cancellationToken.IsCancellationRequested)
 				{
 					var reason = GetCancellationReason(fillingWrongVersion);
-					Logger.Debug($"Aborting image loading: {reason}");
+					Logger.Debug($"Aborting location loading: {reason}");
 					return;
 				}
-				await vi.Reference.ReloadLocation();
+				await reference.ComponentRef.ReloadLocation();
 			}
 		}
 

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using MetadataExtractor;
 using MetadataExtractor.Formats.Xmp;
@@ -64,11 +65,19 @@ namespace PhotoLabeler.ServiceLibrary.Implementations
 		/// </summary>
 		/// <param name="file">The file.</param>
 		/// <returns></returns>
-		public async Task<Photo> GetPhotoFromFileAsync(string file)
+		public async Task<Photo> GetPhotoFromFileAsync(string file, CancellationToken cancellationToken)
 		{
+			if (cancellationToken.IsCancellationRequested)
+			{
+				throw new TaskCanceledException("The task was canceled.");
+			}
 			List<string> labels = new List<string>();
 			IReadOnlyList<Directory> data = null;
 			data = ImageMetadataReader.ReadMetadata(file);
+			if (cancellationToken.IsCancellationRequested)
+			{
+				throw new TaskCanceledException("The task was canceled.");
+			}
 
 			var photo = new Photo { Path = file };
 			data.Where(d => d.Name == XmpDirName).ToList().ForEach(xmpData =>

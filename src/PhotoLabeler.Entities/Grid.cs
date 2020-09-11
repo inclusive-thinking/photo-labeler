@@ -107,6 +107,7 @@ namespace PhotoLabeler.Entities
 
 		public class GridLocationCell : GridCell
 		{
+
 			public GridLocationCell(int cellIndex, GridRow row, Grid grid)
 				: base(cellIndex, row, grid)
 			{
@@ -116,10 +117,13 @@ namespace PhotoLabeler.Entities
 
 			public double? Longitude { get; set; }
 
+			public bool HasGPSInformation => Latitude.HasValue && Longitude.HasValue;
+
 			public bool LocationLoaded { get; set; }
 
-			public Func<GridLocationCell, Task> LoadLocation { get; set; }
+			public Func<Task<bool>> LoadLocation { get; set; }
 
+			public string LocationError { get; set; }
 		}
 
 		public class GridRow
@@ -140,7 +144,8 @@ namespace PhotoLabeler.Entities
 
 			public Grid Grid { get; set; }
 
-
+			public int GetRowIndexWithFilters() =>
+				Grid.Body.Rows.Where(r => r.Visible).ToList().IndexOf(this);
 		}
 
 		public class GridHeader
@@ -192,12 +197,16 @@ namespace PhotoLabeler.Entities
 			{
 				if (!_selectedCellInitialized)
 				{
-					var allRows = Body?.Rows;
+					var allRows = AllRows;
 					if (allRows is null)
 					{
 						return null;
 					}
 					var selectedCell = allRows.SelectMany(r => r.Cells).SingleOrDefault(c => c.Selected);
+					if (selectedCell is null)
+					{
+						selectedCell = Header?.Row?.Cells?.First();
+					}
 					if (selectedCell != null)
 					{
 						_selectedCellInitialized = true;

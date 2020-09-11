@@ -15,13 +15,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhotoLabeler.ServiceLibrary
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhotoLabeler.Data", "PhotoLabeler.Data\PhotoLabeler.Data.csproj", "{45F73CB1-8383-4A53-AFE8-1E421A512CD0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MetadataExtractor", "..\metadata-extractor\MetadataExtractor\MetadataExtractor.csproj", "{7A96C04A-3766-4487-B1B5-CE09DB93A290}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhotoLabeler.PhotoStorageReader", "PhotoLabeler.PhotoStorageReader\PhotoLabeler.PhotoStorageReader.csproj", "{65AA5036-A191-49BA-83F4-B45B6CF1217B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhotoLabeler.Nominatim.Agent", "PhotoLabeler.Nominatim.Agent\PhotoLabeler.Nominatim.Agent.csproj", "{C2E618FB-7AD1-45BB-A8E6-1C2D234C4836}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhotoLabeler.Croscutting", "PhotoLabeler.Croscutting\PhotoLabeler.Croscutting.csproj", "{B9BF717C-62E5-4E6A-835E-DB03FF9B52F6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhotoLabeler.Croscutting", "PhotoLabeler.Croscutting\PhotoLabeler.Croscutting.csproj", "{B9BF717C-62E5-4E6A-835E-DB03FF9B52F6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -53,10 +51,6 @@ Global
 		{45F73CB1-8383-4A53-AFE8-1E421A512CD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{45F73CB1-8383-4A53-AFE8-1E421A512CD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{45F73CB1-8383-4A53-AFE8-1E421A512CD0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7A96C04A-3766-4487-B1B5-CE09DB93A290}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7A96C04A-3766-4487-B1B5-CE09DB93A290}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7A96C04A-3766-4487-B1B5-CE09DB93A290}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7A96C04A-3766-4487-B1B5-CE09DB93A290}.Release|Any CPU.Build.0 = Release|Any CPU
 		{65AA5036-A191-49BA-83F4-B45B6CF1217B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{65AA5036-A191-49BA-83F4-B45B6CF1217B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{65AA5036-A191-49BA-83F4-B45B6CF1217B}.Release|Any CPU.ActiveCfg = Release|Any CPU

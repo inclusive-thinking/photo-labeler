@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Web;
 using Newtonsoft.Json;
 using PhotoLabeler.Nominatim.Agent.Entities;
+using PhotoLabeler.Nominatim.Agent.Exceptions;
 
 namespace PhotoLabeler.Nominatim.Agent
 {
@@ -49,7 +50,12 @@ namespace PhotoLabeler.Nominatim.Agent
 			var result = await _client.SendAsync(message, cancellationToken);
 			result.EnsureSuccessStatusCode();
 			var content = await result.Content.ReadAsStringAsync();
-			return JsonConvert.DeserializeObject<ReverseGeocodeResult>(content);
+			var reverseGeocodeResult = JsonConvert.DeserializeObject<ReverseGeocodeResult>(content);
+			if (reverseGeocodeResult.HasErrors)
+			{
+				throw new NominatimException(reverseGeocodeResult.Error);
+			}
+			return reverseGeocodeResult;
 		}
 	}
 }

@@ -5,5 +5,9 @@
 	focusSelectedItemInsideContainer: function (containerId) {
 		var focusedItem = $("#" + containerId + " [tabindex='0']:first");
 		focusedItem.focus();
+	},
+
+	scrollIntoView: function (element) {
+		element.scrollIntoView();
 	}
 };

@@ -16,10 +16,10 @@ namespace PhotoLabeler.ServiceLibrary.Interfaces
 		/// Gets the photos from dir asynchronous.
 		/// </summary>
 		/// <param name="directory">The directory.</param>
-		/// <param name="loadRecursively">if set to <c>true</c> [load recursively].</param>
+		/// <param name="recursiveLoading">if set to <c>true</c> [load recursively].</param>
 		/// <param name="cancellationToken">The cancellation token.</param>
 		/// <returns></returns>
-		Task<TreeView<Photo>> GetTreeViewFromDirAsync(string directory, bool loadRecursively = false, CancellationToken cancellationToken = default);
+		Task<TreeView<Photo>> GetTreeViewFromDirAsync(string directory, bool recursiveLoading = false, CancellationToken cancellationToken = default);
 
 		/// <summary>
 		/// Gets the photos from dir asynchronous.

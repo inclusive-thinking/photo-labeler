@@ -68,20 +68,28 @@ namespace PhotoLabeler.Entities
 		public double? AltitudeInMeters { get; set; }
 
 		/// <summary>
-		/// Gets or sets the MD5 sum.
+		/// Gets or sets a value indicating whether the current location exists into database.
 		/// </summary>
 		/// <value>
-		/// The MD5 sum.
+		///   <c>true</c> if [database location exists]; otherwise, <c>false</c>.
 		/// </value>
-		public string Md5Sum { get; set; }
+		public bool DbLocationExists { get; set; }
 
 		/// <summary>
-		/// Gets or sets the localization information.
+		/// Gets or sets the location error.
 		/// </summary>
 		/// <value>
-		/// The localization information.
+		/// The location error.
 		/// </value>
-		public List<PhotoLocalizedInfo> LocalizedInfo { get; set; } = new List<PhotoLocalizedInfo>();
+		public string LocationError { get; set; }
+
+		/// <summary>
+		/// Gets or sets the location information.
+		/// </summary>
+		/// <value>
+		/// The location information.
+		/// </value>
+		public string LocationInfo { get; set; }
 
 		/// <summary>
 		/// Gets or sets the error associated to this entity retrieval.
@@ -98,6 +106,15 @@ namespace PhotoLabeler.Entities
 		///   <c>true</c> if this instance has errors; otherwise, <c>false</c>.
 		/// </value>
 		public bool HasErrors => Error != null;
+
+		/// <summary>
+		/// Gets a value indicating whether this instance has GPS information.
+		/// </summary>
+		/// <value>
+		///   <c>true</c> if this instance has GPS information; otherwise, <c>false</c>.
+		/// </value>
+		public bool HasGPSInformation => Latitude.HasValue && Longitude.HasValue;
+
 
 	}
 }

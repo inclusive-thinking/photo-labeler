@@ -35,6 +35,9 @@ namespace PhotoLabeler.Data.Repositories
 			}
 		}
 
+
+		protected long GetLastInsertedRowid() => _connection.QuerySingle<long>("select last_insert_rowid()");
+
 		public void Dispose()
 		{
 			Connection?.Dispose();
